@@ -1,1 +1,1 @@
-This is my bloomberg terminal project. Start date 11-07-2021. Written in jupyter notebook. 
+This is the repository of my personal project. It focuses on quantitative and machine learning methods for financial analysis. Written in jupyter notebook. 

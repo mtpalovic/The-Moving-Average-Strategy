@@ -32,16 +32,25 @@ Step-by-step process:
 The most important parameters are: 
 1) "C"
 - controls the cost of misclassification on the training data
-- 
+- small c/small variance, and high bias/high margin hyperplane (similar to linear model)
+- high c/high variance, and small bias/small margin hyperplane (similar to complex model)
 
-
-
-
+- small c does not penalise the cost of misclassification much (searcher for high margin hyperplane even if it penalises more data points)
+- high c does penalise the cost of misclassification (small margin hyperplane so that all data points are classified correctly), high c might cause the model to overfit
 
 
 2) "gamma"
 3) "kernel"
 
-The SVM model does not provide probability estimates, but they can be calculated five-fold cross-validation (see scikit-learn).
+Bias-variance tradeoff: (compare train/test data)
+Linear model 	- high bias (difference between predicted and expected value, sum of SSR)
+		- low variance (roughly identical linear line between train/test set)
 
-Kernel trick is a method to solve a non-linear problem using a linear classifier. 
+Complex model 	- low bias (squiggly line fits data too well, overfitting in train, poor results in test)
+		- high variance (very different squiggly line in train/test data) 	
+
+The common method for finding the best tradeoff between bias/variance is regularisation ("C" parameter in SVM). 
+
+Notes:
+Kernel trick
+

@@ -1,3 +1,12 @@
 Support Vector Machines: 
 
-The support vector machine (or SVMs) is a supervised machine learning model that can be used for regression and classification problems. 
+The support vector machine (or SVMs) is a supervised machine learning model that can be used for regression and classification problems.
+
+The most important parameters are: 
+1) "C"
+2) "gamma"
+3) "kernel"
+
+The SVM model does not provide probability estimates, but they can be calculated five-fold cross-validation (see scikit-learn).
+
+Kernel trick is a method to solve a non-linear problem using a linear classifier.  

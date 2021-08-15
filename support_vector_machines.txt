@@ -29,17 +29,28 @@ Step-by-step process:
 4) classification report/confusion matrix 
 5) gridsearchcv (prediction with gridsearchcv)
 
+
 The most important parameters are: 
 1) "C"
 - controls the cost of misclassification on the training data
+- a high c aims at classifying all data points correctly by giving the model freedom to choose more data points as support vectors.
+
 - small c/small variance, and high bias/high margin hyperplane (similar to linear model)
 - high c/high variance, and small bias/small margin hyperplane (similar to complex model)
 
 - small c does not penalise the cost of misclassification much (searcher for high margin hyperplane even if it penalises more data points)
 - high c does penalise the cost of misclassification (small margin hyperplane so that all data points are classified correctly), high c might cause the model to overfit
 
+The bias variance tradeoff is a conflict in trying to simultaneously minimise two sources of error that prevent supervised learning algorithms from generalising beyond the training set. 
+
+High variance models may fit training data well but risk of overfitting to noisy/unrepresentative training data. 
+High bias models typically produce simpler models that may fail to capture important regularities.
 
 2) "gamma"
+- nonlinear hyperplanes
+- the higher the gamma value it tries to exactly fit the train data
+- how much curvature I want in a decision boundary
+
 3) "kernel"
 
 Bias-variance tradeoff: (compare train/test data)

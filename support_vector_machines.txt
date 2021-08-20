@@ -29,7 +29,6 @@ Step-by-step process:
 4) classification report/confusion matrix 
 5) gridsearchcv (prediction with gridsearchcv)
 
-
 The most important parameters are: 
 1) "C"
 - controls the cost of misclassification on the training data
@@ -49,9 +48,13 @@ High bias models typically produce simpler models that may fail to capture impor
 2) "gamma"
 - nonlinear hyperplanes
 - the higher the gamma value it tries to exactly fit the train data
-- how much curvature I want in a decision boundary
+- low gamma considers further away points to fit a hyperplane
+- high gamma considers close points only to fit a hyperplane (too much emphasis on close points/overfitting)
 
 3) "kernel"
+- transforms train data so that data that cannot be linearly separated are now linearly separated in a higher number of dimension spaces
+
+High C and high gamma cause overfitting! 
 
 Bias-variance tradeoff: (compare train/test data)
 Linear model 	- high bias (difference between predicted and expected value, sum of SSR)

@@ -1,12 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
-
-
-# initial learn rate decay
-
-
 # In[3]:
 
 
@@ -14,35 +8,39 @@ import numpy as np
 from numpy.random import randint
 import matplotlib.pyplot as plt
 get_ipython().run_line_magic('matplotlib', 'inline')
-get_ipython().run_line_magic('config', 'InlineBackend.figure_format = "retina"')
 
 from datetime import datetime
-
 import seaborn as sns
-
 import pandas as pd
-pd.set_option("display.max_columns", None)
+import math
+
+from sklearn.impute import SimpleImputer
 
 from sklearn.preprocessing import (StandardScaler,
+                                   MinMaxScaler,
                                    Normalizer,
-                                   LabelEncoder
+                                   LabelEncoder,
+                                   OneHotEncoder
                                   )
 
 from sklearn.decomposition import PCA
 
 from sklearn.feature_selection import (VarianceThreshold,
-                                       SelectKBest, mutual_info_regression, mutual_info_classif,
+                                       SelectKBest, mutual_info_classif, chi2,
                                        RFE,
-                                       SelectFromModel
+                                       SelectFromModel,
+                                       SequentialFeatureSelector
                                       )
 
 from sklearn.ensemble import (AdaBoostClassifier, BaggingClassifier, StackingClassifier)
 
 from sklearn.utils import shuffle
 from sklearn.utils.multiclass import unique_labels
-from sklearn.svm import SVR
+from sklearn.svm import SVC
+
 from sklearn.model_selection import (train_test_split,
-                                     GridSearchCV
+                                     GridSearchCV,
+                                     cross_validate
                                     )
 
 from sklearn.metrics import (confusion_matrix,
@@ -66,6 +64,161 @@ from sklearn.base import (BaseEstimator,
 
 import warnings
 warnings.filterwarnings("ignore")
+
+
+# In[20]:
+
+
+path = "C:/Users/mpalovic/Desktop"
+ticker = "gspc"
+file_name = "ta.{}".format(str(ticker)) + ".csv"
+df = pd.read_csv(filepath_or_buffer = "{}/{}".format(path, file_name), parse_dates=["Date"], sep = ",")
+
+df["y"] = df["Date"].dt.year
+df["m"] = df["Date"].dt.month
+df["d"] = df["Date"].dt.day
+
+#datetime index cannot be used as an input to a machine learning model
+#cyclical feature encoding for the date column
+df["cos"] = np.cos(2*math.pi*df["Date"].dt.month/df["Date"].dt.month.max())
+df["sin"] = np.sin(2*math.pi*df["Date"].dt.month/df["Date"].dt.month.max())
+df.drop(labels="Date", axis = 1, inplace = True)
+
+#missing values are replaced with mean
+i = SimpleImputer(missing_values = np.nan, strategy = "mean")
+df = pd.DataFrame(i.fit_transform(df), columns = df.columns)
+
+x = pd.DataFrame(df.loc[:,df.columns != "Close"])
+y = df.iloc[:,1]
+x.sample(10)
+
+
+# In[6]:
+
+
+df.columns
+df.columns.to_list()
+df.dtypes
+df.info()
+df.drop_duplicates()
+df.shape
+df.describe()
+df.isnull().sum()
+df.index
+df.nunique()
+df.sample(n=5)
+df.corr()
+df.astype(
+    {"Volume":float,"On Balance Volume":float}).dtypes
+df.sort_values(by="RSI", ascending=False)
+df.size
+df.select_dtypes("object").head(5)
+df.mask(df.isna(),0)
+
+mask = df["Close"] >4200
+df["Close"][mask]
+
+
+# In[ ]:
+
+
+x.to_numpy()
+y = np.array(np.where(df["Close"] > df["Close"].shift(-7),1,0))
+
+
+# In[ ]:
+
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.4, random_state=42, shuffle = True,stratify=y)
+clf = SVC(C=1000.0, kernel = "rbf")
+clf.fit(x_train,y_train)
+y_pred = clf.predict(x_test)
+y_pred.tolist()
+
+
+# In[24]:
+
+
+df = pd.DataFrame(df)
+df.sample(100)
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:
@@ -96,90 +249,336 @@ warnings.filterwarnings("ignore")
 
 
 class svm(BaseEstimator, TransformerMixin):
-    
-    test_size = 0.2
-    m_vals = 0.05
-    
+
     def __init__(self,
-                 estimator = "SVC"
-                 
-                 kernel:Optional[str] = "rbf",
-                 C:int = 1e3, # to represent 1000 (1 times 10 to the third power)
-                 
-                 learn_rate:float = 0.001,
-                 tol:float = 0.05,
-                 batch_size:int = 1,
-                 n_epochs:int = 1000,
-                 decay:float = 1, 
-                 random_number:Optional[float] = None,
-                 visualisation = True,
-                 
-                 n = False # works only for linearly separable data and is like a switch
-                ):
+                 estimator:str = "SVC",
+                 kernel:str = "linear",
+                 C:int = 1e3,
+                 random_number:int = None):
+        
         
         self.estimator = estimator
         self.kernel = self._kernel_type(kernel, **kwargs)
         
-        self.C = C
-        self.learn_rate = learn_rate
-        self.tol = tol
-        self.batch_size = batch_size
-        self.n_epochs = n_epochs
-        self.decay = decay
+        self.C = C if C is not None
         self.random_number = random_number if random_number is not None else np.random.randint(0,100,size=1)
         
-        self.n = n
-        
-        # initialise model params so I have to come up with them later
-        self.w = False
-        self.b = False
         
         
-        self.visualisation = visualisation
-        self.colors = {1:"r", -1:"b"}
-        if self.visualisation:
-            self.fig = plt.figure()
-            self.ax = self.fig.add_subplot(1,1,1)
-            
-            
+        
+        
+        
+    
+    
+    
     def decorator_function(original_function):
         def wrapper_function(*args, **kwargs):
             print("executed before {} (original function).".format(original_function.__name__))
             return original_function(*args, **kwargs)
         return wrapper_function
-            
     
-             
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    def s(self, x:np.array, y:np.array):
         
-    @staticmethod
-    # static method has no self parameter and knows nothing about a class
-    def missing_values(X:np.ndarray, threshold:int = None, verbose = False):
-        """Step 0: Data pre-processing. Missing values."""
-        if threshold:
-            m_vals_pct = ([len(isnull(X[:,i])) for i in range (X.shape[1])]/X.shape[0])
-            to_del = [i for i,v in enumerate(m_vals_pct) if v >= threshold]
-            if verbose:
-                print("del {}.".format(to_del))
-            new_cols = [i for i in range(X.shape[1]) if i not in to_del]
-            X = X[:,new_cols]
-        return X
+        if not isinstance(x, np.array):
+            x = np.array(x, dtype=float64)
+        
+        elif:
+            
+            
+            
+            
+            
+            
+            x_train, x_test, y_train, y_test = train_test_split(x,y,test_size = 0.3, random_state = 43)
+        
+        
+        
+        
+        
+        
+        
+        
+        else:
+            raise ValueError(
+                "x must be of type np.array"
+            )
+        
+        
+        
+        
+        if x_train.shape[0] = x_test.shape[0]:
+            print(f"\n{x_test.shape[0]} obs in test set less than {x_train.shape[0]} obs in train set.")
+
+        
+        
+
+         
+
+        
+        
+        
+        
+        n_features = x.shape[1]
+        x_train, x_test = x_train.values.reshape(-1, n_features), x_test.values.reshape(-1, n_features)
+    
+        return x_train, x_test, y_train, y_test
     
     
     
     
     
-    def _estimator(self, n:str)
-        est = {
-            "linear": LinearRegression(),
-            "svc": SVC(kernel=self.kernel, C = self.C)
-        }
+    def feature_scaling(x):
+        
+        n_samples, n_features = x.shape
+        x_train, x_test = self.train_test_split()
+        
+        scaler = StandardScaler()
+        
+        x_train = scaler.fit_transform(x_train.values.reshape(-1,n_features))
+        x_test = scaler.transform(x_test.values.reshape(-1,n_features))
+        
+        return x_train, x_test
     
-        return est[n]
+    
+    
+    def dimensionality_reduction(self, var_retained:float = .95, np:bool = False):
+        
+        x_train, x_test = feature_scaling()
+        pca = PCA(var_retained)
+        
+        x_train = pca.fit_transform(x_train)
+        x_test = pca.transform(x_test)
+        
+        if len(x_train.shape[1]) == len(n_features) and isinstance(x_train, np.float64):
+            raise ValueError(
+                "%d n_features in X_train_pca is not less than %d n_features in X_train." 
+                    (len(X_train_pca.shape[1]), len(n_features))
+            )
+                                                                    
+        explained_variance = pca.explained_variance_ratio_
+
+        return X_train, X_test
+    
+    
+    
+    
+    
+    
+    def feature_selection(switch:bool):
+        if switch:
+            x_transformed = None
+            def variance_threshold(x_train):
+                if isinstance(x, pd.DataFrame):
+                    x = x.loc[:, x.columns!="Date"]
+                    x.select_dtypes(include = np.number)
+        
+                    scaler = MinMaxScaler(feature_range = (0,1))
+                    x_scaled = scaler.fit_transform(x)
+
+                    selector = VarianceThreshold(.03)
+                    x_transformed = selector.fit_transform(x_scaled)
+                    x_transformed = pd.DataFrame(x_transformed)
+    
+                    print(f"Original n_features: {x.shape[1]}.")
+                    print("Transformed n_features: {}.".format(x_transformed.shape[1]))
+    
+                    dropped = [col for col in x.columns if col not in x.columns[selector.get_support()]]
+                    dropped_list = [features for features in dropped]
+                    x_transformed.drop(dropped, axis = 1, inplace = True)
+        
+                return x_transformed
+        
+        else:
+            x_transformed = None
+            def selectKBest(x, n=3):
+                if isinstance(x, pd.DataFrame):
+                    x = x.loc[:, x.columns!="Date"]
+                    x.select_dtypes(include = np.number)
+
+                    lab_enc = LabelEncoder()
+                    y_enc = lab_enc.fit_transform(y)
+
+                    selector = SelectKBest(score_func = mutual_info_classif, k = n)
+                    selector.fit(x,y_enc)
+
+                    a = [col for col in x.columns if col in x.columns[selector.get_support(True)]]
+                    x_transformed = x.loc[:,x.columns.isin(a)]
+        
+                    print("Original {}.".format(x.shape))
+                    print("Transformed {}.".format(x_transformed.shape))
+    
+                    #returns index where true
+                    z = {x.columns.get_loc(c): c for index,c in enumerate(x.columns[selector.get_support(True)])}
+    
+                return x_transformed
+           
+        return variance_threshold() if switch is not None else selectKBest()
+    
+    
+    
     
     
 
+
+    def fit(self, x_train, y_train):
         
-    def _kernel_type(self, kernel:str = None, **kwargs):
+        x_train, x_test = split()
+        if x_train:
+        
+            n_samples, n_features = X.shape
+        
+            # if gamma is not specified in init, it is specified as
+            if not self.gamma:
+                self.gamma = 1/(n_features*X.var())
+        
+            if X_train.shape[1] != n_features:
+                raise ValueError("{} != {}".format(X_train.shape[1], self.n_features))
+            elif X_train.shape[1] < 2:
+                raise ValueError("cannot fit model with {} features.".format(X_train.shape[1]))
+            
+        
+            # Checks X and y for consistent length, enforces X to be 2D and y 1D. 
+            # By default, X is checked to be non-empty and containing only finite values. 
+            # Standard input checks are also applied to y, such as checking that y does not have np.nan or np.inf targets.
+            X, y = check_X_y(X, 
+                             y, 
+                             force_all_finite=False) # accepts np.nan in X
+        
+        
+            # By default, the input is checked to be a non-empty 2D array containing only finite values.
+            X = check_array(X, ensure_2d=True, ensure_min_samples=1, ensure_min_features=1)
+            
+            
+            
+            
+            self.est = self._estimator(self.estimator)
+            self.est.fit(X_train, y_train)
+            
+            
+            
+            
+            
+            
+            
+            
+            if self.n:
+                y_train_pca_ = np.where(y_train_pca <= 0, -1,1)
+                n_samples, n_features = train.shape
+                
+                self.w = np.zeros(n_features) #each feature has to have some weight, in linear regression each beta parameter is a feature that has some weight
+                self.b = 0
+
+                if isinstance(self.C, type(None)):
+                    raise ValueError(
+                        "Regularisation parameter %s not defined in the constructor method." (str(self.C))
+                    )
+                else: 
+                    lambda_param = 1 / self.C
+            
+            
+            
+                self.n_iters = int(self.n_iters)
+                if self.n_iters <= 0:
+                    raise ValueError(
+                        f"{self.n_iters} is less than zero."
+                    )
+        
+        
+        
+            #gradient descent
+            for _ in range(1, self.n_iters):
+                for index, x_i in enumerate(X.train_pca):
+                    condition = y_train_pca_[index] * (np.dot(x_i, self.w) - self.b) >= 1
+                    if condition:
+                        # update params if condition true
+                        # parameter = parameter - (self.learning rate * gradient (derivative of cost function))
+                        self.w = self.w - (self.learn_rate * (2 * (1/self.C) * self.w))
+                    else:
+                        self.w = self.w - (self.learn_rate * ((2 * (1/self.C) * self.w) - np.dot(x_i, y_train_pca_[index])))
+                        self.b = self.b - (self.learn_rate * y_train_pca_[index])
+                        
+        return something if self.n is not None else
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+for i in x.select_dtypes(include = np.number):
+    if np.any(np.isnan(x[i])) == True:
+        print("ok")
+
+
+# In[ ]:
+
+
+def label_encoding(self, y:np.ndarray):
+        l = LabelEncoder()
+        y = l.fit_transform(y)
+        return y
+    
+if np:
+            # calculate cov matrix
+            cov_matrix = np.cov(X_train.T)
+            eigen_values, eigen_vectors = np.linalg.eig(cov_matrix)
+            
+            
+            # calculating explained variance on each component
+            var_expl = [i/(sum(eigen_values))*100 for i in eigen_values]
+            
+            # identifying components that explain at least 95% variance
+            cum_var_expl = np.cumsum(var_expl)
+
+
+# In[ ]:
+
+
+def _kernel_type(self, kernel:str = None, **kwargs):
         """Kernel is a hyperparameter and is selected by the researcher."""
         
         if self.estimator == "SVC":
@@ -209,209 +608,12 @@ class svm(BaseEstimator, TransformerMixin):
                 raise ValueError(f"{self.kernel} kernel not recognised.")
 
         return 
-           
-        
-        
-        
-        
-        
-    def loss_function(self):
-        """The below returns the loss function for the stochastic gradient descent."""
-        # The input to this function is the predicted output and the actual output.
-        pass
-        
-        
-        
-        
-        
-        
-        
-    def label_encoding(self, y:np.ndarray):
-        l = LabelEncoder()
-        y = l.fit_transform(y)
-        return y
-        
-        
-    def train_test_split(self, X_pca:np.ndarray, y:np.ndarray):    
-        """Step 3: Data pre-processing. Split the dataset into train and test set."""
-        
-        X = X.values.reshape(-1,1)
-        y = y.values.reshape(-1,1)
-        
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size = svm.test_size, random_state = self.random_number, shuffle = True, stratify = y)
-        
-        X_train.shape, y_train.shape
-        X_test.shape, y_test.shape
-        
-        # Convert to float64
-        X_train, X_test = np.array(X_train,dtype = np.float64), np.array(X_test,dtype = np.float64) 
-        
-        # reshape
-        n_samples, n_features = X.shape
-        X_train, X_test = X_train.reshape(-1, n_features), X_test.reshape(-1, n_features) 
-        
-        
-        return X_train, X_test, y_train, y_test
-    
-    
-    
-    
-    
-    @decorator_function
-    def feature_scaling(self):
-        """Step 4: Data pre-processing. Feature scaling."""
-        
-        X_train, X_test = train_test_split()
-        
-        # Standardization is the process of scaling data so that they have a mean value of 0 and a standard deviation of 1
-        scaler = StandardScaler()
-        
-        # fit_transform on X_train but transform on X_test
-        X_train = scaler.fit_transform(X_train.values.reshape(-1,1))
-        X_test = scaler.transform(X_test.values.reshape(-1,1))
-        
-        
-    
-        
-    def feature_extraction(self, var_retained:float = .95, np:bool = False):
-        """Step 5: Data pre-processing. Principal Component Analysis."""
-        pca = PCA(var_retained) # choose n_components such that 95% variance remains explained
-        
-        X_train_pca = pca.fit_transform(X_train)
-        X_test_pca = pca.transform(X_test)
-        
-        if len(X_train_pca.shape[1]) = len(X_train.shape[1]) and isinstance(X_train_pca, np.float64):
-            raise ValueError(
-                "%d n_features in X_train_pca is not less than %d n_features in X_train." 
-                    (len(X_train_pca.shape[1]), len(X_train.shape[1]))
-            )
-                                                                    
-        explained_variance = pca.explained_variance_ratio_
-        
-        if np:
-            # calculate cov matrix
-            cov_matrix = np.cov(X_train.T)
-            eigen_values, eigen_vectors = np.linalg.eig(cov_matrix)
-            
-            
-            # calculating explained variance on each component
-            var_expl = [i/(sum(eigen_values))*100 for i in eigen_values]
-            
-            # identifying components that explain at least 95% variance
-            cum_var_expl = np.cumsum(var_expl)
-            
-    
-        return X_train, X_test
-    
-    
-    
-    
-    
-    def fit(self, X_train:Union[np.ndarray, pd.DataFrame], y_train:Union[np.ndarray, pd.DataFrame], 
-            sample_weight = 0.1):
-        """Step 6: Model-fitting."""
-        
-        if isinstance(X, pd.DataFrame):
-        
-            X_train, y_train = train_test_split()
-            n_samples, n_features = X.shape
-        
-            # if gamma is not specified in init, it is specified as
-            if not self.gamma:
-                self.gamma = 1/(n_features*X.var())
-        
-            if X_train.shape[1] != n_features:
-                raise ValueError("{} != {}".format(X_train.shape[1], self.n_features))
-            elif X_train.shape[1] < 2:
-                raise ValueError("cannot fit model with {} features.".format(X_train.shape[1]))
-            
-        
-            # Checks X and y for consistent length, enforces X to be 2D and y 1D. 
-            # By default, X is checked to be non-empty and containing only finite values. 
-            # Standard input checks are also applied to y, such as checking that y does not have np.nan or np.inf targets.
-            X, y = check_X_y(X, 
-                             y, 
-                             force_all_finite=False) # accepts np.nan in X
-        
-        
-            # By default, the input is checked to be a non-empty 2D array containing only finite values.
-            X = check_array(X, ensure_2d=True, ensure_min_samples=1, ensure_min_features=1)
-            
-            
-            
-            
-            self.est = self._estimator(self.estimator)
-            self.est.fit(X_train, y_train)
-        
-        
-        
-        
-        
-        
-        
-            
-            
-            
-            
-            
-                           
-                
-        
-        
 
-        
-        
-        
-        
-        
-        if self.n:
-            y_train_pca_ = np.where(y_train_pca <= 0, -1,1)
-            n_samples, n_features = X.shape
-            self.w = np.zeros(n_features)
-            self.b = 0
 
-            
-            if isinstance(self.C, type(None)):
-                raise ValueError(
-                    "Regularisation parameter %s not defined in the constructor method." (str(self.C))
-                )
-            else: 
-                lambda_param = 1 / self.C
-                
-            self.n_iters = int(self.n_iters)
-            if self.n_iters <= 0:
-                raise ValueError(
-                    "{} must be greater than zero".format(self.n_iters)
-                )
-        
-            for _ in range(1, self.n_iters):
-                for index, x_i in enumerate(X.train_pca):
-                    condition = y_train_pca_[index] * (np.dot(x_i, self.w) - self.b) >= 1
-                    if condition:
-                        # update params if condition true
-                        # parameter = parameter - (self.learning rate * gradient (derivative of cost function))
-                        self.w = self.w - (self.learn_rate * (2 * (1/self.C) * self.w))
-                    else:
-                        self.w = self.w - (self.learn_rate * ((2 * (1/self.C) * self.w) - np.dot(x_i, y_train_pca_[index])))
-                        self.b = self.b - (self.learn_rate * y_train_pca_[index])
-        
-        
-        
-        
-        
-        
-        return self if self.n is False else 
-        
-        
-        
+# In[ ]:
 
-        
-        
-        
-        
-        
-    def predict(self, X_test:np.array, y = None):
+
+def predict(self, X_test:np.array, y = None):
         """Step 7: Model prediction."""
         if isinstance(X_test, np.array) and not y:
             check_is_fitted(self, msg="is_fitted")          
@@ -430,30 +632,11 @@ class svm(BaseEstimator, TransformerMixin):
         return y_pred if self.n is False else linear output
         
         
-        
-        
+    
     def evaluation(self):
         """The following function evaluates how well the model performs on the test data. Step 6: model evaluation."""
         print("\nThe Classifier Accuracy Score is {:.2f}\n".format(clf.score(X_test, y_test)))
         
-        
-        
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     def get_params(self, deep = True):
         """
         The below function returns parameter values.
@@ -468,17 +651,6 @@ class svm(BaseEstimator, TransformerMixin):
         for param, val in params.items():
             setattr(self, param, val)
         return self    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     def gridSearchCV(self):
         param_grid = {
@@ -501,585 +673,97 @@ class svm(BaseEstimator, TransformerMixin):
         print("Test Accuracy: {}.".format(accuracy_score(y_test, y_pred)))
         print("Best Params: {}.".format(model.best_params_))
         
-        
-        
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
     def main():
-        gspc = pd.read_csv("^GSPC.csv")
+        f = svm()
         
+        f.load_data()
+        f.split()
+        f.feature_scaling()
+        f.dimensionality_reduction()
+        f.variance_threshold()
+        f.selectKBest()
         
+        f.fit()
+        f.predict()
         
+    if __name__ = "__main__":
+        main()
+
+
+# In[ ]:
+
+
+def main(a,b,q):
+    if q:
+        e = None
+        def plus(a,b):
+            e = a+b
+            return "Ahoj volam sa martin"
+    else:
+        E = None
+        def minus(a,b):
+            E = a-b
+            return E
+    return plus(a,b) if q is not None else minus(a,b)
+
+
+# In[ ]:
+
+
+main(40,10, q = "ok")
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+def color_neg_vals(val):
+    color = "red" if val > 1400 else "black"
+    return "color:%s"%color
+
+# style with pandas dataframe
+#df["Close"].to_frame().style.applymap(color_neg_vals)
+
+#string, notice col name
+#df.query("Close > 4695")
+
+def outliers(df, n_std:int=3):
+    
+    df = pd.DataFrame(df)
+    df_ = df.copy()
+    
+    
+    for col in range(len(df_.columns)):
         
-        m = svm()
-        
-        m.train_test_split()
-        m.feature_scaling()
-        m.feature_extraction()
-        
-        m.fit()
-        m.predict()
-        
-        
-        
-        
-   
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[4]:
-
-
-path = "C:/Users/mpalovic/Desktop"
-file_name = "ta.gspc" + ".csv"
-
-custom_date_parser = lambda x: datetime.strptime(x, "%Y-%m-%d")
-df = pd.read_csv(filepath_or_buffer = "{}/{}".format(path, file_name), 
-                 sep = ",", 
-                 index_col=None,                 
-                 parse_dates=["Date"], 
-                 date_parser=custom_date_parser)
-df = pd.DataFrame(df)
-
-x = df.loc[:, df.columns!="Close"]
-y = df.iloc[:,1]
-
-
-# In[5]:
-
-
-df
-
-
-# In[1]:
-
-
-df
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[65]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[63]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-date = datetime.date(2016,7,11)
-
-
-# In[ ]:
-
-
-@staticmethod
-def is_workday(d):
-    if d.weekday() ==5 or d.weekday() ==6:
-        return False
-    return True
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-is_workday(date)
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-#original_function = decorator_function(original_function)
-#original_function()
-
-# if np.all(np.abs(diff) <= tol):
-# break  
+        mean, std = np.mean(df_[col]), np.std(df_[col])
+        mean = float(mean)
+        std = float(std)
+
+        cut_off = std*n_std
+        lower, upper = mean - cut_off, mean + cut_off
+        outliers = [x for x in df_[col] if x < lower or x > upper]
+        print(f"{col}: {len(outliers)}")
+        df_ = [x for x in df[col] if x not in outliers]
+    
+    
+    return df_
+
+
+# In[ ]:
+
+
+@decorator_function
+    def missing_vals(x, threshold = 0.6):
+        threshold = float(threshold)
+        for i in x.columns:
+            if isinstance(x,pd.DataFrame):
+                if float((x[i].isnull().sum()/x[i].shape[0])*100) > threshold:
+                    x_transformed = x.drop(labels = i, axis = 1)
+        return x_transformed
+    
 

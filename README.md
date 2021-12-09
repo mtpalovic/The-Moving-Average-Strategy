@@ -1,1 +1,1 @@
-This is the repository of my personal project. The Golden Cross Strategy is used in the modelling the S&P500 Index as it generates a trading signal when the 50-day moving average crosses above the 200-day moving average. Written in jupyter notebook.
+This is the repository of my personal project.

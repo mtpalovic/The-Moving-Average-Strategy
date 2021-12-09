@@ -18,7 +18,6 @@ import seaborn as sns
 import pandas as pd
 import math
 
-#feature preprocessing
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import (normalize,
                                    StandardScaler,
@@ -28,7 +27,7 @@ from sklearn.preprocessing import (normalize,
                                   )
 from sklearn.decomposition import PCA
 
-#feature selection
+
 from sklearn.feature_selection import (VarianceThreshold,
                                        SelectKBest, 
                                        mutual_info_classif,
@@ -36,14 +35,14 @@ from sklearn.feature_selection import (VarianceThreshold,
                                        SelectFromModel,
                                        SequentialFeatureSelector
                                       )
-#model selection
+
 from sklearn.svm import SVC
 from sklearn.ensemble import (AdaBoostClassifier, 
                               BaggingClassifier, 
                               StackingClassifier
                              )
 
-#model evaluation
+
 from sklearn.metrics import (confusion_matrix,
                              classification_report,
                              accuracy_score,
@@ -52,18 +51,22 @@ from sklearn.metrics import (confusion_matrix,
                              f1_score
                             )
 
+
 from sklearn.utils import shuffle
-from sklearn.utils.multiclass import unique_labels
+
 from sklearn.model_selection import (train_test_split,
                                      GridSearchCV,
                                      cross_validate
                                     )
+
 from sklearn.utils.estimator_checks import check_estimator
+
 from sklearn.utils.validation import (check_array, 
                                       check_is_fitted, 
                                       check_X_y,
                                       _check_sample_weight
                                      )
+
 from sklearn.base import (BaseEstimator, ClassifierMixin)
 
 import warnings
@@ -72,21 +75,7 @@ warnings.filterwarnings("ignore")
 
 
 
-
-
 import module
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -133,7 +122,21 @@ class svm(BaseEstimator, ClassifierMixin):
         }
         
         
-        
+    
+    def dec(original):
+        def wrap(*args,**kwargs):
+            print(f"wrap executed before {original.__name__}")
+            
+            
+            
+            return original(*args,**kwargs)
+        return wrap
+    
+    
+    
+    
+    
+    
     
     def check_attr(self):
         ins = None
@@ -144,14 +147,13 @@ class svm(BaseEstimator, ClassifierMixin):
         return ins
     
     
+    @dec
     def __str__(self):
         
         
         #returns the name of the estimator
         return self.estimator.__str__()
             
-    
-    
     
     
     def create_arr(self):
@@ -466,6 +468,8 @@ class svm(BaseEstimator, ClassifierMixin):
             self.accuracy = accuracy_score(y_pred, y_test)
         
         
+        #for _ in self.iters
+        
         
         return self.accuracy
     
@@ -527,14 +531,28 @@ class svm(BaseEstimator, ClassifierMixin):
         search = GridSearchCV(estimator = SVC(), 
                              param_grid = param_grid, 
                              cv = 5, #int, specify number of folds in StratifiedKfold
-                             verbose = 1, # control verbosity, the higher the more messages
+                             verbose = 4, # control verbosity, the higher the more messages
                              refit = True, # refit an estimator using the best found params on data
                              scoring = "accuracy")
         
         search.fit(x_train, y_train)
-        y_pred = search.predict(x_test)
+        #y_pred = search.predict(x_test)
         
-        print("Test Accuracy: {}.".format(accuracy_score(y_test, y_pred)))
+        #print("Test Accuracy: {}.".format(accuracy_score(y_test, y_pred)))
+        
+        
+        
+        
+        
+        
+        
+    def initialise_params(self):
+        _, n_features = x.shape
+        w = np.zeros(n_features)
+        b = 0
+        return w, b
+    
+    
 
 
 # In[ ]:
@@ -593,71 +611,6 @@ if __name__ == "__main__":
     
     #hyperparams
     model.gridSearchCV()
-
-
-# In[ ]:
-
-
-model.gridSearchCV()
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-#for _ in self.iters
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-#assign a function from another module to some variable if used often
-add_fund_from_another_module = module.add
-add_fund_from_another_module(10,10)
-
-a, *_, c  = (1,2,3,4,5)
-c
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
 
 # In[ ]:

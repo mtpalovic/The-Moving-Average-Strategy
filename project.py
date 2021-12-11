@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[19]:
 
 
 import numpy as np
@@ -17,6 +17,7 @@ from datetime import datetime
 import seaborn as sns
 import pandas as pd
 import math
+import time as t
 
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import (normalize,
@@ -73,18 +74,13 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-
-
-import module
-
-
 # In[2]:
 
 
 np.random.randint(0,100,size=None)
 
 
-# In[10]:
+# In[56]:
 
 
 class svm(BaseEstimator, ClassifierMixin):
@@ -122,13 +118,19 @@ class svm(BaseEstimator, ClassifierMixin):
         
         
     
-    def dec(original):
+    def dec(f):
         def wrap(*args,**kwargs):
-            print(f"wrap executed before {original.__name__}")
             
+            s = t.time()
             
+            #run the function
+            f(*args,**kwargs)
             
-            return original(*args,**kwargs)
+            e = t.time()
+            
+            print("Time to run {}: {:.4f}sec".format(f.__name__, e-s))
+        
+        #decorator returns wrap
         return wrap
     
     
@@ -138,15 +140,15 @@ class svm(BaseEstimator, ClassifierMixin):
     
     
     def check_attr(self):
-        ins = None
+        attr = None
         
         #check class instance
         if hasattr(svm,"NUM"):
-            ins = svm.NUM
-        return ins
+            a = svm.NUM
+        
+        return a
     
     
-    @dec
     def __str__(self):
         
         
@@ -433,44 +435,48 @@ class svm(BaseEstimator, ClassifierMixin):
         
         
         return x_train, x_test
-    
-    
-    
-    
-    
-    
-    
-    
+        
     
     
     
     
     def fit(self):
         
-        #import from here 
-        x_train, x_test = self.scale()
+        #the below func must run before fit, without parenthesis
+        if callable(self.scale):
+        
+        
+            #import from here 
+            x_train, x_test = self.scale()
         
         
         
-        #pass an an np.ndarray
-        x_train = np.array(x_train)
+            #pass an an np.ndarray
+            x_train = np.array(x_train)
         
         
-        if isinstance(x_train, np.ndarray):
+            if isinstance(x_train, np.ndarray):
             
-            #do not import x_train, x_test because I have modified it
-            _, _, y_train, y_test = self.data_split()
-            
-            
-            
-            estimator = SVC(kernel = self.kernels[self.kernel_type])
+                #do not import x_train, x_test because I have modified it
+                _, _, y_train, y_test = self.data_split()
             
             
-            model = estimator.fit(x_train, y_train)
+                #checks if kernel exists
+                if self.kernel_type in self.kernels.keys():
+                
+                    estimator = SVC(kernel = self.kernels[self.kernel_type])
+                    model = estimator.fit(x_train, y_train)
             
             
-            y_pred = model.predict(x_test)
-            self.accuracy = accuracy_score(y_pred, y_test)
+                    y_pred = model.predict(x_test)
+                    self.accuracy = accuracy_score(y_pred, y_test)
+            
+                else:
+                    print(f"{self.kernel_type} required to be in {self.kernel.keys()}")
+        
+        else:
+            print("not run")
+        
         
         
         #for _ in self.iters
@@ -479,45 +485,41 @@ class svm(BaseEstimator, ClassifierMixin):
     
     
     
-    
-    def acrc(self):
+    @dec
+    def accuracy_score(self):
         
         x_train, x_test = self.scale()
         _, _, y_train, y_test = self.data_split()
         
         
         if isinstance(x_train, np.ndarray):
+            
             #creates dict
             classifiers = self.create_dict()
-        
-        
-            list_classif = ["linear", "rbf", "poly"]
             
-             
-            
-            for i in list_classif:
+            for i in list(self.kernels.keys())[:len(self.kernels.keys())]:
                 classifiers[i] = SVC(kernel=i)
         
         
         
         
-            accuracies = self.create_dict()
+            accr = self.create_dict()
         
             for algorithm, classifier in classifiers.items():
                 classifier.fit(x_train, y_train)
                 y_pred = classifier.predict(x_test)
-                accuracies[algorithm] = accuracy_score(y_pred, y_test)
+                accr[algorithm] = accuracy_score(y_pred, y_test)
             
         
                 
-            for algorithm, accuracy in sorted(accuracies.items())[:len(accuracies.keys())]:
+            for algorithm, accuracy in sorted(accr.items())[:len(accr.keys())]:
             
                 #notice must be 2x %% in order to show % in print
                 print("%s Accuracy: %.2f%%" % (algorithm, 100*accuracy))
             
         
         
-        return accuracies
+        return accr
     
     
     
@@ -556,9 +558,17 @@ class svm(BaseEstimator, ClassifierMixin):
         w = np.zeros(n_features)
         b = 0
         return w, b
+        
+    
+    def print_instance_attributes(self):
+        
+        #print all attributes with self
+        # self.__dict__.items() cannot be indexed, hence wrap into a list
+        for attribute, value in list(self.__dict__.items())[:len(self.__dict__.items())]:
+            print(attribute, value)
 
 
-# In[11]:
+# In[57]:
 
 
 if __name__ == "__main__":
@@ -610,28 +620,13 @@ if __name__ == "__main__":
     model.fit()
     
     #model accuracy
-    model.acrc()
+    model.accuracy_score()
     
     #hyperparams
     #model.gridSearchCV()
-
-
-# In[12]:
-
-
-model.datetime_index()
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
+    
+    #check all instance attributes
+    model.print_instance_attributes()
 
 
 # In[ ]:

@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[19]:
+# In[1]:
 
 
 import numpy as np
 from numpy.random import randint
 import matplotlib.pyplot as plt
 get_ipython().run_line_magic('matplotlib', 'inline')
+import random
 
 import sys
 np.set_printoptions(threshold=sys.maxsize)
@@ -70,46 +71,47 @@ from sklearn.utils.validation import (check_array,
 
 from sklearn.base import (BaseEstimator, ClassifierMixin)
 
-import warnings
-warnings.filterwarnings("ignore")
+
+# In[4]:
 
 
-# In[2]:
+#low (inclusive) to high (exclusive)
+np.random.randint(1,2)
 
 
-np.random.randint(0,100,size=None)
+# In[5]:
 
 
-# In[56]:
+class svm():
 
-
-class svm(BaseEstimator, ClassifierMixin):
-
-    NUM = 1e-3
+    #NUM = 1e-3
     
     
     def __init__(self,
+                 ticker:str = "gspc",
                  estimator:str = "SVC",
-                 kernel_type:str = "poly",
+                 k:str = "poly",
                  C:int = 10,
                  n_iters:int = 1e3,
                  random_number:int = None,
-                 test_size = 0.8):
+                 test_size = 0.8,
+                 verbose = True):
         
         
         
         
         self.estimator = estimator
-        self.kernel_type = kernel_type                     
+        self.k = k                
         self.C = C 
         self.n_iters = n_iters
         self.random_number = random_number if random_number is not None else np.random.randint(0,100,size=None)
         self.test_size = test_size
+        self.ticker = ticker
+        self.verbose = verbose
         
         
-        #pozor nizsie zadej func self.kernel_linear
-        #self.kernel_type must exactly match the key in dict a potom zadef func below
         
+        #kernel dict, self.kernels[self.kernel_type], self.kernel_type must exactly match the key in dict
         self.kernels = {
             "linear": self.kernel_linear,
             "rbf": self.kernel_rbf,
@@ -117,13 +119,17 @@ class svm(BaseEstimator, ClassifierMixin):
         }
         
         
+        
+        
+        
+        
+    
     
     def dec(f):
         def wrap(*args,**kwargs):
             
             s = t.time()
             
-            #run the function
             f(*args,**kwargs)
             
             e = t.time()
@@ -137,16 +143,20 @@ class svm(BaseEstimator, ClassifierMixin):
     
     
     
-    
-    
-    def check_attr(self):
-        attr = None
-        
-        #check class instance
+    # getattr, setattr, hasattr
+    #check class attribute, returns bool true/false
+    def cls_attr(self):
         if hasattr(svm,"NUM"):
-            a = svm.NUM
+            x = getattr(svm,"NUM", None)
         
-        return a
+        else:
+            pass
+        
+        return x
+    
+    
+    
+    
     
     
     def __str__(self):
@@ -155,6 +165,13 @@ class svm(BaseEstimator, ClassifierMixin):
         #returns the name of the estimator
         return self.estimator.__str__()
             
+    
+    
+    def create_tuple(self):
+        
+        self.tuple = ()
+        
+        return self.tuple
     
     
     def create_arr(self, *args):
@@ -170,9 +187,10 @@ class svm(BaseEstimator, ClassifierMixin):
         return self.dict
     
     
+    
     def load_data(self):
         path = "C:/Users/mpalovic/Desktop"
-        ticker = "gspc"
+        ticker = self.ticker
         file_name = "ta.{}".format(str(ticker)) + ".csv"
         data = pd.read_csv(filepath_or_buffer = "{}/{}".format(path, file_name), parse_dates=["Date"], sep = ",")
         df = pd.DataFrame(data)
@@ -182,8 +200,8 @@ class svm(BaseEstimator, ClassifierMixin):
         
         #choose dtypes
         df.astype(
-            {"Volume":float,"On Balance Volume":float}
-        ).dtypes
+                {"Volume":float,"On Balance Volume":float}
+            ).dtypes
 
         df.select_dtypes(np.number)
         
@@ -193,9 +211,9 @@ class svm(BaseEstimator, ClassifierMixin):
     
     
     def datetime_index(self):
-    
+        
         df = self.load_data()
-
+    
         
         #creates a list with the below vals
         func = self.create_arr("cos", "sin")
@@ -218,6 +236,7 @@ class svm(BaseEstimator, ClassifierMixin):
     
     
     def mis_vals(self):
+        
         df = self.datetime_index()
         
         for _ in df.select_dtypes(np.number):
@@ -230,7 +249,9 @@ class svm(BaseEstimator, ClassifierMixin):
     
     
     def x_y_(self):
+        
         df = self.mis_vals()
+        
         pred = (df.shift(-7)["Close"] >= df["Close"]) #bool, if price in 14 days bigger, returns 1
         df.drop("Close", 1, inplace=True)
         pred = pred.iloc[:-7]
@@ -306,7 +327,7 @@ class svm(BaseEstimator, ClassifierMixin):
             selector = VarianceThreshold(num)
             selector.fit_transform(x)
             selector.get_support()
-            high_var_cols = [i for i,e in enumerate(selector.get_support(indices = False))]
+            high_var_cols = [int(i) for i,e in enumerate(selector.get_support(indices = False))]
             high_var_cols
             #returns cols with above threshold variance, that is what I want
 
@@ -375,7 +396,7 @@ class svm(BaseEstimator, ClassifierMixin):
         
         par = {
             "Est": self.estimator,
-            "Kernel": self.kernel_type,
+            "Kernel": self.k,
             "C": self.C,
             "n_iters": self.n_iters,
             "Rand num": self.random_number
@@ -440,11 +461,33 @@ class svm(BaseEstimator, ClassifierMixin):
     
     
     
-    def fit(self):
+    def fit(self, u):
+        
+        #linear hyperparams
+        linear_params = {
+           "kernel": "linear",
+            "C": 1e3
+        }
+        
+        #poly hyperparams
+        poly_params = {
+            "kernel": "poly",
+            "C": 1e3,
+            "degree": np.random.randint(2,3) #low inclusive, high exclusive
+        }
+        
+        #rbf hyperparams
+        rbf_params = {
+            "kernel": "rbf",
+            "C": 1e3,
+            "gamma": 0.1
+        }
+        
+        
+        
         
         #the below func must run before fit, without parenthesis
         if callable(self.scale):
-        
         
             #import from here 
             x_train, x_test = self.scale()
@@ -462,24 +505,38 @@ class svm(BaseEstimator, ClassifierMixin):
             
             
                 #checks if kernel exists
-                if self.kernel_type in self.kernels.keys():
+                if self.k in self.kernels.keys():
                 
-                    estimator = SVC(kernel = self.kernels[self.kernel_type])
+                    estimator = SVC(kernel = self.kernels[self.k])
                     model = estimator.fit(x_train, y_train)
             
             
                     y_pred = model.predict(x_test)
                     self.accuracy = accuracy_score(y_pred, y_test)
             
+            
                 else:
-                    print(f"{self.kernel_type} required to be in {self.kernel.keys()}")
+                    print(f"{self.k} required to be in {self.kernel.keys()}")
+                    
+                    if self.k == "linear":
+                        SVC(C = linear_params["C"], kernel = linear_params["kernel"])
+                    
+                    elif self.k == "poly":
+                        SVC(C = poly_params["C"], kernel = poly_params["kernel"], degree = poly_params["degree"])
+                        
+                    else:
+                        SVC(C = rbf_params["C"], kernel = rbf_params["kernel"], gamma=rbf_params["gamma"])
+                    
+                    
+    
+            else:
+                pass
         
         else:
-            print("not run")
+            pass
         
         
         
-        #for _ in self.iters
         return self.accuracy
     
     
@@ -523,7 +580,128 @@ class svm(BaseEstimator, ClassifierMixin):
     
     
     
-    def gridSearchCV(self):
+        
+        
+        
+        
+    def initialise_params(self):
+        _, n_features = x.shape
+        w = np.zeros(n_features)
+        b = 0
+        return w, b
+
+
+# In[10]:
+
+
+if __name__ == "__main__":
+    m = svm(estimator="SVC", k = "linear", C = 1000, n_iters=1000)
+    m.__str__()
+    m.create_arr()
+    m.load_data()
+    m.datetime_index()
+    m.mis_vals()
+    m.x_y_()
+    m.label_encoding()
+    m.data_split()
+    m.scale()
+    m.selectK()
+    m.get_params()
+    m.return_params()
+    m.feature_selection()
+    m.fit()
+    #m.accuracy_score()
+    m.create_tuple()
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+def gridSearchCV(self):
         
         x_train, x_test = self.scale()
         _, _, y_train, y_test = self.data_split()
@@ -546,91 +724,4 @@ class svm(BaseEstimator, ClassifierMixin):
         #y_pred = search.predict(x_test)
         
         #print("Test Accuracy: {}.".format(accuracy_score(y_test, y_pred)))
-        
-        
-        
-        
-        
-        
-        
-    def initialise_params(self):
-        _, n_features = x.shape
-        w = np.zeros(n_features)
-        b = 0
-        return w, b
-        
-    
-    def print_instance_attributes(self):
-        
-        #print all attributes with self
-        # self.__dict__.items() cannot be indexed, hence wrap into a list
-        for attribute, value in list(self.__dict__.items())[:len(self.__dict__.items())]:
-            print(attribute, value)
-
-
-# In[57]:
-
-
-if __name__ == "__main__":
-    model = svm(estimator="SVC", kernel_type = "linear", C = 1000, n_iters=1000)
-    
-    #class attribute check
-    model.check_attr()
-    
-    #return the name of the estimator
-    model.__str__()
-    
-    #creates an empty list
-    model.create_arr()
-    
-    #loda data
-    model.load_data()
-    
-    #remove datetime index as scikit cannot work with date type
-    model.datetime_index()
-    
-    #input missing values as mean
-    model.mis_vals()
-    
-    #create x,y
-    model.x_y_()
-    
-    #y label encoding
-    model.label_encoding()
-    
-    #train test split
-    model.data_split()
-    
-    #scale features to common scale
-    model.scale()
-    
-    #select columns
-    model.selectK()
-    
-    #returns init vals as a dict
-    model.get_params()
-    
-    ##returns init vals as a list
-    model.return_params()
-    
-    #select columns
-    model.feature_selection()
-    
-    #fit
-    model.fit()
-    
-    #model accuracy
-    model.accuracy_score()
-    
-    #hyperparams
-    #model.gridSearchCV()
-    
-    #check all instance attributes
-    model.print_instance_attributes()
-
-
-# In[ ]:
-
-
-
 

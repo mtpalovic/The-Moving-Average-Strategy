@@ -553,6 +553,13 @@ class s():
     
     @dec
     def accuracy_score(self):
+        """
+        :param arg1: Description of `arg1`
+        :type arg1: mypackage.CustomType
+        :param arg2: Description of `arg2`
+        :type arg2: :term:`dict-like <mapping>`
+        """
+        
         
         x_train, x_test = self.scale()
         _, _, y_train, y_test = self.data_split()

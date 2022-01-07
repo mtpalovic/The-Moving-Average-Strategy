@@ -86,25 +86,30 @@ np.random.randint(1,2)
 
 class s():
     
-    #class attribute, svm.TEST_SIZE, default value
     TEST_SIZE = 0.8
     N_ITERS = 1e3
     TICKER = "gspc"
     
-    #C:float = controls the trade-off between classifying all the points correctly and having a straight line (decision boundary)
-    #small C = cost of misclassif low, soft margin
-    #large C = high cost of misclassif, hard margin
-        
-    #kernel = puts non-linearly separable data into higher dimension of spaces so that it is linearly separable
+    """
+    :param c: controls the trade-off between 
+        classifying all the points correctly and having a straight line, 
+        small c cost of misclassif low, soft margin, 
+        large c high cost of misclassif, hard margin 
+    :type c: float
+    :kernel: non-linearly separable data into higher dimension of spaces (linearly separable)
+    :type kernel: string
+    :degree: only relevant for poly kernel, ignored by all other kernels
+    :type degree: int, optional
     
-    #degree = only relevant for poly kernel, ignored by all other kernels
+    :param gamma: how far the influence of of a training set goes, 
+        high gamma = only points near the decision line are considered to determine the direction of the line, 
+        close points to the line have high weight, 
+        low gamma = points far away from the line are also considered
+    :type gamma: float
     
-    #gamma = how far the influence of of a training set goes
-    #high gamma = only points near the decision line are considered to determine the direction of the line, close points to the line have high weight
-    #low gamma = points far away from the line are also considered
+    """
     
-    #tol:float = default 1e-3 tolerance for stopping criterion
-    #max_iter = -1 no limit on iterations
+    
     
     
     def __init__(self,
@@ -553,12 +558,6 @@ class s():
     
     @dec
     def accuracy_score(self):
-        """
-        :param arg1: Description of `arg1`
-        :type arg1: mypackage.CustomType
-        :param arg2: Description of `arg2`
-        :type arg2: :term:`dict-like <mapping>`
-        """
         
         
         x_train, x_test = self.scale()
@@ -601,24 +600,13 @@ class s():
         
         
     def initialise_params(self):
-        
-        """Summary line.
-
-        Extended description of function.
-
-        Parameters
-        ----------
-        arg1 : int
-            Description of arg1
-        arg2 : str
-            Description of arg2
-
-        Returns
-        -------
-        bool
-            Description of return value
-
         """
+        :param arg1: description
+        :type arg1: int
+        :return: initialise params
+        :rtype: int
+        """
+        
         
         _, n_features = x.shape
         w = np.zeros(n_features)

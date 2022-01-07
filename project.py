@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[2]:
 
 
 import numpy as np
@@ -71,47 +71,57 @@ from sklearn.utils.validation import (check_array,
 
 from sklearn.base import (BaseEstimator, ClassifierMixin)
 
+from typing import Optional, Union
 
-# In[4]:
+
+# In[3]:
 
 
 #low (inclusive) to high (exclusive)
 np.random.randint(1,2)
 
 
-# In[5]:
+# In[8]:
 
 
-class svm():
-
-    #NUM = 1e-3
+class s():
+    
+    #class attribute, svm.TEST_SIZE, default value
+    TEST_SIZE = 0.8
+    N_ITERS = 1e3
+    TICKER = "gspc"
+    
+    #C:float = controls the trade-off between classifying all the points correctly and having a straight line (decision boundary)
+    #small C = cost of misclassif low, soft margin
+    #large C = high cost of misclassif, hard margin
+        
+    #kernel = puts non-linearly separable data into higher dimension of spaces so that it is linearly separable
+    
+    #degree = only relevant for poly kernel, ignored by all other kernels
+    
+    #gamma = how far the influence of of a training set goes
+    #high gamma = only points near the decision line are considered to determine the direction of the line, close points to the line have high weight
+    #low gamma = points far away from the line are also considered
+    
+    #tol:float = default 1e-3 tolerance for stopping criterion
+    #max_iter = -1 no limit on iterations
     
     
     def __init__(self,
-                 ticker:str = "gspc",
                  estimator:str = "SVC",
                  k:str = "poly",
                  C:int = 10,
-                 n_iters:int = 1e3,
-                 random_number:int = None,
-                 test_size = 0.8,
-                 verbose = True):
-        
-        
-        
+                 gamma = 1,
+                 random_number:int = None):
         
         self.estimator = estimator
         self.k = k                
         self.C = C 
-        self.n_iters = n_iters
+        self.gamma = gamma
         self.random_number = random_number if random_number is not None else np.random.randint(0,100,size=None)
-        self.test_size = test_size
-        self.ticker = ticker
-        self.verbose = verbose
-        
-        
-        
-        #kernel dict, self.kernels[self.kernel_type], self.kernel_type must exactly match the key in dict
+       
+     
+        #kernel dict, self.kernels[self.k], self.k must exactly match the key in dict
         self.kernels = {
             "linear": self.kernel_linear,
             "rbf": self.kernel_rbf,
@@ -120,11 +130,7 @@ class svm():
         
         
         
-        
-        
-        
-    
-    
+       
     def dec(f):
         def wrap(*args,**kwargs):
             
@@ -144,15 +150,19 @@ class svm():
     
     
     # getattr, setattr, hasattr
-    #check class attribute, returns bool true/false
+    #check if class object has an attribute
     def cls_attr(self):
-        if hasattr(svm,"NUM"):
-            x = getattr(svm,"NUM", None)
         
-        else:
-            pass
+        try:
+            #last arg value returned if attr not found in a class
+            getattr(s,"N_ITERS")
+            
+        #if default not provided, attr error is raised
+        except AttributeError:
+            
+            print("not found")
         
-        return x
+        
     
     
     
@@ -190,7 +200,7 @@ class svm():
     
     def load_data(self):
         path = "C:/Users/mpalovic/Desktop"
-        ticker = self.ticker
+        ticker = s.TICKER
         file_name = "ta.{}".format(str(ticker)) + ".csv"
         data = pd.read_csv(filepath_or_buffer = "{}/{}".format(path, file_name), parse_dates=["Date"], sep = ",")
         df = pd.DataFrame(data)
@@ -307,7 +317,7 @@ class svm():
     
     
     
-    def feature_selection(self, num:float = 1.0*10e-3):
+    def feature_selection(self, num: Union[float,int] = 1.0*10e-3):
         
         
         x, _ = self.x_y_()
@@ -398,7 +408,6 @@ class svm():
             "Est": self.estimator,
             "Kernel": self.k,
             "C": self.C,
-            "n_iters": self.n_iters,
             "Rand num": self.random_number
         } 
         
@@ -434,7 +443,7 @@ class svm():
         
         x_train, x_test, y_train, y_test = train_test_split(x, 
                                                         y, 
-                                                        test_size=self.test_size, 
+                                                        test_size=s.TEST_SIZE, 
                                                         random_state=self.random_number, 
                                                         shuffle = True,
                                                         stratify=y
@@ -461,7 +470,7 @@ class svm():
     
     
     
-    def fit(self, u):
+    def fit(self):
         
         #linear hyperparams
         linear_params = {
@@ -585,17 +594,36 @@ class svm():
         
         
     def initialise_params(self):
+        
+        """Summary line.
+
+        Extended description of function.
+
+        Parameters
+        ----------
+        arg1 : int
+            Description of arg1
+        arg2 : str
+            Description of arg2
+
+        Returns
+        -------
+        bool
+            Description of return value
+
+        """
+        
         _, n_features = x.shape
         w = np.zeros(n_features)
         b = 0
         return w, b
 
 
-# In[10]:
+# In[6]:
 
 
 if __name__ == "__main__":
-    m = svm(estimator="SVC", k = "linear", C = 1000, n_iters=1000)
+    m = s(estimator="SVC", k = "linear", C = 1000, gamma = 1, random_number=None)
     m.__str__()
     m.create_arr()
     m.load_data()
@@ -614,10 +642,10 @@ if __name__ == "__main__":
     m.create_tuple()
 
 
-# In[ ]:
+# In[7]:
 
 
-
+m.cls_attr()
 
 
 # In[ ]:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[ ]:
 
 
 import numpy as np
@@ -74,21 +74,25 @@ from sklearn.base import (BaseEstimator, ClassifierMixin)
 from typing import Optional, Union
 
 
-# In[3]:
+# In[ ]:
 
 
 #low (inclusive) to high (exclusive)
 np.random.randint(1,2)
 
 
-# In[8]:
+# In[ ]:
 
 
 class s():
     
     TEST_SIZE = 0.8
     N_ITERS = 1e3
-    TICKER = "gspc"
+    
+    #create class attribute
+    kernels = {}
+    
+    
     
     """
     :param c: controls the trade-off between 
@@ -96,8 +100,10 @@ class s():
         small c cost of misclassif low, soft margin, 
         large c high cost of misclassif, hard margin 
     :type c: float
+    
     :kernel: non-linearly separable data into higher dimension of spaces (linearly separable)
-    :type kernel: string
+    :type kernel: str
+    
     :degree: only relevant for poly kernel, ignored by all other kernels
     :type degree: int, optional
     
@@ -109,9 +115,6 @@ class s():
     
     """
     
-    
-    
-    
     def __init__(self,
                  estimator:str = "SVC",
                  k:str = "poly",
@@ -120,13 +123,24 @@ class s():
                  random_number:int = None):
         
         self.estimator = estimator
-        self.k = k                
+        
+        
+        if k not in self.kernels.keys():
+            print("Error")
+        else:
+            self.k = k                
+        
+        
+        
+        
         self.C = C 
         self.gamma = gamma
         self.random_number = random_number if random_number is not None else np.random.randint(0,100,size=None)
        
      
         #kernel dict, self.kernels[self.k], self.k must exactly match the key in dict
+        
+        
         self.kernels = {
             "linear": self.kernel_linear,
             "rbf": self.kernel_rbf,
@@ -154,22 +168,31 @@ class s():
     
     
     
-    # getattr, setattr, hasattr
-    #check if class object has an attribute
-    def cls_attr(self):
-        
-        try:
-            #last arg value returned if attr not found in a class
-            getattr(s,"N_ITERS")
-            
-        #if default not provided, attr error is raised
-        except AttributeError:
-            
-            print("not found")
-        
-        
     
-    
+    def cls_attr(self, u = None):
+        """Check class attribute. Other methods: getattr, setattr, hasattr
+        :param u: defaults to None
+        :type u: bool
+        
+        :raises AttributeError: if default not provided in getattr
+        
+        :return:
+        :rtype:
+        """
+        
+        
+        if(u is None):
+            try:
+                
+                getattr(s,"N_ITE")
+            
+            except AttributeError as e:
+                print(e)
+        
+        else:
+            pass
+        
+        
     
     
     
@@ -205,7 +228,7 @@ class s():
     
     def load_data(self):
         path = "C:/Users/mpalovic/Desktop"
-        ticker = s.TICKER
+        ticker = "gspc"
         file_name = "ta.{}".format(str(ticker)) + ".csv"
         data = pd.read_csv(filepath_or_buffer = "{}/{}".format(path, file_name), parse_dates=["Date"], sep = ",")
         df = pd.DataFrame(data)
@@ -614,39 +637,27 @@ class s():
         return w, b
 
 
-# In[6]:
-
-
-if __name__ == "__main__":
-    m = s(estimator="SVC", k = "linear", C = 1000, gamma = 1, random_number=None)
-    m.__str__()
-    m.create_arr()
-    m.load_data()
-    m.datetime_index()
-    m.mis_vals()
-    m.x_y_()
-    m.label_encoding()
-    m.data_split()
-    m.scale()
-    m.selectK()
-    m.get_params()
-    m.return_params()
-    m.feature_selection()
-    m.fit()
-    #m.accuracy_score()
-    m.create_tuple()
-
-
-# In[7]:
-
-
-m.cls_attr()
-
-
 # In[ ]:
 
 
-
+if __name__ == "__main__":
+    m = s(estimator="SVC", k = "li", C = 1000, gamma = 1, random_number=None)
+    #m.__str__()
+    #m.create_arr()
+    #m.load_data()
+    #m.datetime_index()
+    #m.mis_vals()
+    #m.x_y_()
+    #m.label_encoding()
+    #m.data_split()
+    #m.scale()
+    #m.selectK()
+    #m.get_params()
+    #m.return_params()
+    #m.feature_selection()
+    #m.fit()
+    #m.accuracy_score()
+    #m.create_tuple()
 
 
 # In[ ]:

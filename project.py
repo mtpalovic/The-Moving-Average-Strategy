@@ -9,68 +9,23 @@ from numpy.random import randint
 import matplotlib.pyplot as plt
 get_ipython().run_line_magic('matplotlib', 'inline')
 import random
-
-import sys
-np.set_printoptions(threshold=sys.maxsize)
-
-
 from datetime import datetime
 import seaborn as sns
 import pandas as pd
 import math
 import time as t
-
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import (normalize,
-                                   StandardScaler,
-                                   MinMaxScaler,
-                                   LabelEncoder,
-                                   OneHotEncoder
-                                  )
+from sklearn.preprocessing import (normalize, StandardScaler, MinMaxScaler, LabelEncoder, OneHotEncoder)
 from sklearn.decomposition import PCA
-
-
-from sklearn.feature_selection import (VarianceThreshold,
-                                       SelectKBest, 
-                                       mutual_info_classif,
-                                       RFE,
-                                       SelectFromModel,
-                                       SequentialFeatureSelector
-                                      )
-
+from sklearn.feature_selection import (VarianceThreshold, SelectKBest, mutual_info_classif)
 from sklearn.svm import SVC
-from sklearn.ensemble import (AdaBoostClassifier, 
-                              BaggingClassifier, 
-                              StackingClassifier
-                             )
-
-
-from sklearn.metrics import (confusion_matrix,
-                             classification_report,
-                             accuracy_score,
-                             precision_score,
-                             recall_score,
-                             f1_score
-                            )
-
-
+from sklearn.ensemble import (AdaBoostClassifier, BaggingClassifier, StackingClassifier)
+from sklearn.metrics import (confusion_matrix,classification_report,accuracy_score,precision_score)
 from sklearn.utils import shuffle
-
-from sklearn.model_selection import (train_test_split,
-                                     GridSearchCV,
-                                     cross_validate
-                                    )
-
+from sklearn.model_selection import (train_test_split, GridSearchCV, cross_validate)
 from sklearn.utils.estimator_checks import check_estimator
-
-from sklearn.utils.validation import (check_array, 
-                                      check_is_fitted, 
-                                      check_X_y,
-                                      _check_sample_weight
-                                     )
-
+from sklearn.utils.validation import (check_array, check_is_fitted, check_X_y,_check_sample_weight)
 from sklearn.base import (BaseEstimator, ClassifierMixin)
-
 from typing import Optional, Union
 
 

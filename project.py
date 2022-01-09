@@ -89,10 +89,6 @@ class s():
     TEST_SIZE = 0.8
     N_ITERS = 1e3
     
-    #create class attribute
-    kernels = {}
-    
-    
     
     """
     :param c: controls the trade-off between 
@@ -115,32 +111,52 @@ class s():
     
     """
     
+    
+    
+    def param_check(m):
+        
+        #ref refers to self 
+        def f(ref, estimator, k, C, gamma, random_number):
+            for p in [C, gamma]:
+                if not isinstance(p,(int,float)):
+                    raise TypeError("c and gamma must be floats")
+                
+                else:
+                    pass
+                
+                
+            for v in [estimator, k]:
+                if not isinstance(v,str):
+                    raise TypeError("estim and k must be strings")
+                else:
+                    pass
+            
+            
+            return m(ref, estimator, k, C, gamma, random_number)
+        
+        return f
+    
+    
+    
+    @param_check
     def __init__(self,
                  estimator:str = "SVC",
-                 k:str = "poly",
-                 C:int = 10,
+                 k:str = "linear",
+                 C:int = 1000,
                  gamma = 1,
                  random_number:int = None):
         
-        self.estimator = estimator
-        
-        
-        if k not in self.kernels.keys():
-            print("Error")
-        else:
-            self.k = k                
         
         
         
         
-        self.C = C 
-        self.gamma = gamma
-        self.random_number = random_number if random_number is not None else np.random.randint(0,100,size=None)
-       
-     
+        
+        
+        
+        
+        
+        
         #kernel dict, self.kernels[self.k], self.k must exactly match the key in dict
-        
-        
         self.kernels = {
             "linear": self.kernel_linear,
             "rbf": self.kernel_rbf,
@@ -148,8 +164,27 @@ class s():
         }
         
         
+        self.estimator = estimator
+        self.gamma = gamma
+        self.random_number = random_number if random_number is not None else np.random.randint(0,100,size=None)
         
-       
+        #restrictions on the init params
+        if k not in self.kernels.keys():
+            raise AttributeError(f"kernel {k} required to be in {self.kernels.keys()}")
+        else:
+            self.k = k
+            
+        
+        
+        if 0.1 <= C <= 1000:
+            self.C = C
+        else:
+            raise AttributeError(f"Param C:{C} not within required range")
+        
+        
+    
+    
+    
     def dec(f):
         def wrap(*args,**kwargs):
             
@@ -198,7 +233,6 @@ class s():
     
     
     def __str__(self):
-        
         
         #returns the name of the estimator
         return self.estimator.__str__()
@@ -641,7 +675,7 @@ class s():
 
 
 if __name__ == "__main__":
-    m = s(estimator="SVC", k = "li", C = 1000, gamma = 1, random_number=None)
+    m = s(estimator="SVC", k = "linear", C = 1000, gamma = 0.1, random_number=None)
     #m.__str__()
     #m.create_arr()
     #m.load_data()

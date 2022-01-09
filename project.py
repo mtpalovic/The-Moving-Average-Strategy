@@ -72,7 +72,7 @@ from typing import Union
 np.random.randint(1,2)
 
 
-# In[42]:
+# In[63]:
 
 
 class s():
@@ -298,24 +298,28 @@ class s():
     
     
     def datetime_index(self):
+        """Transforms dates into cos,sin
+        :return: dataframe with dates adjusted
+        :rtype: dataframe
+        """
         
-        df = self.load_data()
-    
+        pi = float(math.pi)
         
-        #creates a list with the below vals
-        func = self.create_arr("cos", "sin")
+        d = self.load_data()
+        mo = d["Date"].dt.month
+        
+        f = self.create_arr("cos", "sin")
     
-    
-        for i,v in enumerate(func):
+        for i,v in enumerate(f):
             if i == 0:
-                df[v] = np.cos(2 * math.pi * df["Date"].dt.month / df["Date"].dt.month.max())
+                d[v] = np.cos(2 * pi * mo / mo.max())
             elif i == 1:
-                df[v] = np.sin(2 * math.pi * df["Date"].dt.month / df["Date"].dt.month.max())
+                d[v] = np.sin(2 * pi * mo / mo.max())
         
         
-        df.drop(labels="Date", axis = 1, inplace = True)
+        d.drop(labels="Date", axis = 1, inplace = True)
         
-        return df
+        return d
     
     
     
@@ -323,14 +327,18 @@ class s():
     
     
     def mis_vals(self):
+        """Check missing values
+        :return: dataframe with missing vals checked
+        :rtype: dataframe
+        """
+        d = self.datetime_index()
         
-        df = self.datetime_index()
-        
-        for _ in df.select_dtypes(np.number):
+        for _ in d.select_dtypes(np.number):
             i = SimpleImputer(missing_values = np.nan, strategy = "mean")
-            df = pd.DataFrame(i.fit_transform(df), columns = df.columns)
+            d = pd.DataFrame(i.fit_transform(d), 
+                             columns = d.columns)
         
-        return df
+        return d
     
     
     
@@ -686,7 +694,7 @@ class s():
         return w, b
 
 
-# In[43]:
+# In[64]:
 
 
 if __name__ == "__main__":
@@ -710,34 +718,34 @@ if __name__ == "__main__":
     #m.create_tuple()
 
 
-# In[44]:
+# In[65]:
 
 
 print(m)
 
 
-# In[45]:
+# In[51]:
 
 
 m.__dict__.keys()
 
 
-# In[46]:
+# In[52]:
 
 
 m.instance_attributes()
 
 
-# In[47]:
+# In[53]:
 
 
 m.cls_attr()
 
 
-# In[ ]:
+# In[66]:
 
 
-
+m.datetime_index()
 
 
 # In[ ]:

@@ -187,7 +187,7 @@ class s():
             
     @staticmethod        
     def d_check(val):
-        """Check init param type before it is set in the init method. Only str type.
+        """Check init param type before it is set in the init method. Only int type.
         :param val: val in the init method
         :type val: 
         """

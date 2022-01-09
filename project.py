@@ -1,42 +1,78 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[7]:
 
 
 import numpy as np
+
 from numpy.random import randint
+
 import matplotlib.pyplot as plt
+
 get_ipython().run_line_magic('matplotlib', 'inline')
+
 import random
+
 from datetime import datetime
 import seaborn as sns
+
 import pandas as pd
 import math
+
 import time as t
+
 from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import (normalize, StandardScaler, MinMaxScaler, LabelEncoder, OneHotEncoder)
+
+from sklearn.preprocessing import (normalize, 
+                                   StandardScaler, 
+                                   MinMaxScaler, 
+                                   LabelEncoder, 
+                                   OneHotEncoder)
+
 from sklearn.decomposition import PCA
-from sklearn.feature_selection import (VarianceThreshold, SelectKBest, mutual_info_classif)
+
+from sklearn.feature_selection import (VarianceThreshold, 
+                                       SelectKBest, 
+                                       mutual_info_classif)
+
 from sklearn.svm import SVC
-from sklearn.ensemble import (AdaBoostClassifier, BaggingClassifier, StackingClassifier)
-from sklearn.metrics import (confusion_matrix,classification_report,accuracy_score,precision_score)
+
+from sklearn.ensemble import (AdaBoostClassifier, 
+                              BaggingClassifier, 
+                              StackingClassifier)
+
+from sklearn.metrics import (confusion_matrix,
+                             classification_report,
+                             accuracy_score,
+                             precision_score)
+
 from sklearn.utils import shuffle
-from sklearn.model_selection import (train_test_split, GridSearchCV, cross_validate)
+
+from sklearn.model_selection import (train_test_split, 
+                                     GridSearchCV, 
+                                     cross_validate)
+
 from sklearn.utils.estimator_checks import check_estimator
-from sklearn.utils.validation import (check_array, check_is_fitted, check_X_y,_check_sample_weight)
+
+from sklearn.utils.validation import (check_array, 
+                                      check_is_fitted, 
+                                      check_X_y,
+                                      _check_sample_weight)
+
 from sklearn.base import (BaseEstimator, ClassifierMixin)
-from typing import Optional, Union
+
+from typing import Union
 
 
-# In[ ]:
+# In[8]:
 
 
 #low (inclusive) to high (exclusive)
 np.random.randint(1,2)
 
 
-# In[ ]:
+# In[9]:
 
 
 class s():
@@ -621,7 +657,7 @@ class s():
         return w, b
 
 
-# In[ ]:
+# In[10]:
 
 
 if __name__ == "__main__":

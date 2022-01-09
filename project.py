@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[7]:
+# In[1]:
 
 
 import numpy as np
@@ -65,14 +65,14 @@ from sklearn.base import (BaseEstimator, ClassifierMixin)
 from typing import Union
 
 
-# In[8]:
+# In[2]:
 
 
 #low (inclusive) to high (exclusive)
 np.random.randint(1,2)
 
 
-# In[9]:
+# In[42]:
 
 
 class s():
@@ -190,8 +190,9 @@ class s():
     
     
     
-    def cls_attr(self, u = None):
-        """Check class attribute. Other methods: getattr, setattr, hasattr
+    def cls_attr(self, a = "N_ITERS", l = None):
+        """Check class attribute, not init (instance) attr. Other methods: getattr, setattr, hasattr.
+        Init params are instance attributes, class attributes are defined outside constructor.
         :param u: defaults to None
         :type u: bool
         
@@ -202,10 +203,10 @@ class s():
         """
         
         
-        if(u is None):
+        if(l is None):
+            
             try:
-                
-                getattr(s,"N_ITE")
+                k = getattr(s,a)
             
             except AttributeError as e:
                 print(e)
@@ -213,26 +214,47 @@ class s():
         else:
             pass
         
+        return float(k)
         
     
     
+    def instance_attributes(self):
+        """
+        :return: Returns a list of instance attributes
+        :rtype: list
+        """
+        return self.__dict__.keys()
+        
+        
     
     
     def __str__(self):
+        """String representation of an object. Init params are instance attributes.
+        :return: init param as string
+        :rtype: str
+        """
+        return f"init params:{self.estimator},{self.k}, {self.C}, {self.gamma}, {self.random_number}"
+    
         
-        #returns the name of the estimator
-        return self.estimator.__str__()
-            
     
     
     def create_tuple(self):
-        
+        """Creates a tuple
+        :return:
+        :rtype:
+        """
         self.tuple = ()
         
         return self.tuple
     
     
+    
     def create_arr(self, *args):
+        """Creates a list
+        :return:
+        :rtype:
+        """
+        
         self.arr = [*args]
         
         return self.arr
@@ -240,6 +262,10 @@ class s():
     
     
     def create_dict(self):
+        """Creates a dictionary
+        :return:
+        :rtype:
+        """
         self.dict = {}
         
         return self.dict
@@ -250,7 +276,10 @@ class s():
         path = "C:/Users/mpalovic/Desktop"
         ticker = "gspc"
         file_name = "ta.{}".format(str(ticker)) + ".csv"
-        data = pd.read_csv(filepath_or_buffer = "{}/{}".format(path, file_name), parse_dates=["Date"], sep = ",")
+        data = pd.read_csv(filepath_or_buffer = "{}/{}".format(path, file_name), 
+                           parse_dates=["Date"], 
+                           sep = ",")
+        
         df = pd.DataFrame(data)
         
         df.sample(n=5)
@@ -657,12 +686,13 @@ class s():
         return w, b
 
 
-# In[10]:
+# In[43]:
 
 
 if __name__ == "__main__":
     m = s(estimator="SVC", k = "linear", C = 1000, gamma = 1, random_number=None)
-    #m.__str__()
+    m.__str__()
+    m.instance_attributes()
     #m.create_arr()
     #m.load_data()
     #m.datetime_index()
@@ -680,28 +710,28 @@ if __name__ == "__main__":
     #m.create_tuple()
 
 
-# In[ ]:
+# In[44]:
 
 
+print(m)
 
 
-
-# In[ ]:
-
+# In[45]:
 
 
+m.__dict__.keys()
 
 
-# In[ ]:
+# In[46]:
 
 
+m.instance_attributes()
 
 
-
-# In[ ]:
-
+# In[47]:
 
 
+m.cls_attr()
 
 
 # In[ ]:

@@ -154,6 +154,7 @@ class s():
         }
         
         
+        #best to leave alone, does not impose restrictions on accessing variable
         self._estimator = estimator
         
         self.gamma = self.d_check(gamma)

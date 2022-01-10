@@ -135,16 +135,14 @@ class s():
     
     
     @param_check
-    def __init__(self,
-                 estimator:str = "SVC",
-                 k:str = "linear",
-                 C:int = 1000,
-                 gamma = 1,
-                 random_number:int = None):
-        
-        
-        
-        
+    def __init__(self, estimator:str = "SVC", k:str = "linear", C:int = 1000, gamma = 1, random_number:int = None):
+        """init method is used to initialise instance attributes.
+        __estimator is a private attribute.
+        @ return self.__estimator is used to get values of private attr (indirectly)
+        @estimator.setter is used to set value of a private attr
+        :return: 
+        :rtype: 
+        """
         
         #kernel dict, self.kernels[self.k], self.k must exactly match the key in dict
         self.kernels = {
@@ -155,9 +153,8 @@ class s():
         
         
         #best to leave alone, does not impose restrictions on accessing variable
-        self._estimator = estimator
-        
-        self.gamma = self.d_check(gamma)
+        self.__estimator = estimator
+        self.__gamma = self.d_check(gamma)
         
         self.random_number = random_number if random_number is not None else np.random.randint(0,100,size=None)
         
@@ -181,12 +178,30 @@ class s():
         :return: 
         :rtype: 
         """
-        return self._estimator
+        return self.__estimator
     
     
     @estimator.setter
     def estimator(self,v):
-        self._estimator = v
+        self.__estimator = v
+        
+    
+    @property
+    def gamma(self):
+        """init initiates instance attr and this method returns private attr
+        :return: without this method private attr cannot be accessed (encapsulation)
+        :rtype: 
+        """
+        return self.__gamma
+    
+    @gamma.setter
+    def gamma(self, h):
+        if 0 <= h <= 1000:
+            self.__gamma = h
+        else:
+            self.__gamma = None
+        
+
             
              
             
@@ -199,8 +214,6 @@ class s():
         if not isinstance(val,int):
             raise TypeError("val must be of type int")
         return val
-    
-    
     
     
     
@@ -779,19 +792,13 @@ except AttributeError as e:
 # In[ ]:
 
 
-m.estimator
+m.gamma = 150000
 
 
 # In[ ]:
 
 
-
-
-
-# In[ ]:
-
-
-
+m.gamma
 
 
 # In[ ]:

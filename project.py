@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 import numpy as np
@@ -65,14 +65,14 @@ from sklearn.base import (BaseEstimator, ClassifierMixin)
 from typing import Union
 
 
-# In[2]:
+# In[ ]:
 
 
 #low (inclusive) to high (exclusive)
 np.random.randint(1,2)
 
 
-# In[63]:
+# In[ ]:
 
 
 class s():
@@ -154,7 +154,7 @@ class s():
         }
         
         
-        self.estimator = estimator
+        self._estimator = estimator
         
         self.gamma = self.d_check(gamma)
         
@@ -174,7 +174,20 @@ class s():
             raise AttributeError(f"Param C:{C} not within required range")
             
             
+    @property
+    def estimator(self):
+        """Property decorator read only attribute. Instance attr cannot be changed.
+        :return: 
+        :rtype: 
+        """
+        return self._estimator
+    
+    
+    @estimator.setter
+    def estimator(self,v):
+        self._estimator = v
             
+             
             
     @staticmethod        
     def d_check(val):
@@ -490,7 +503,6 @@ class s():
     def get_params(self, deep = True):
         
         par = {
-            "Est": self.estimator,
             "Kernel": self.k,
             "C": self.C,
             "Rand num": self.random_number
@@ -678,7 +690,7 @@ class s():
         
         
         
-        
+    
     def initialise_params(self):
         """
         :param arg1: description
@@ -694,7 +706,7 @@ class s():
         return w, b
 
 
-# In[64]:
+# In[ ]:
 
 
 if __name__ == "__main__":
@@ -718,31 +730,31 @@ if __name__ == "__main__":
     #m.create_tuple()
 
 
-# In[65]:
+# In[ ]:
 
 
 print(m)
 
 
-# In[51]:
+# In[ ]:
 
 
 m.__dict__.keys()
 
 
-# In[52]:
+# In[ ]:
 
 
 m.instance_attributes()
 
 
-# In[53]:
+# In[ ]:
 
 
 m.cls_attr()
 
 
-# In[66]:
+# In[ ]:
 
 
 m.datetime_index()
@@ -751,19 +763,22 @@ m.datetime_index()
 # In[ ]:
 
 
-
-
-
-# In[ ]:
-
-
-
+s.N_ITERS
 
 
 # In[ ]:
 
 
+try:
+    m.estimator = "martin"
+except AttributeError as e:
+    print (e)
 
+
+# In[ ]:
+
+
+m.estimator
 
 
 # In[ ]:

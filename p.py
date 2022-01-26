@@ -56,7 +56,7 @@ from sklearn.utils.estimator_checks import check_estimator
 from typing import Union
 
 
-# In[18]:
+# In[27]:
 
 
 class s():
@@ -278,15 +278,18 @@ class s():
         
         d = pd.DataFrame(d_)
         
-        d.sample(n=5)
         
         
-        #choose dtypes
         d.astype(
                 {"Volume":float,"On Balance Volume":float}
             ).dtypes
 
         d.select_dtypes(np.number)
+        
+        
+        d = d.iloc[:,2:3,:]
+        
+        
         
         
         return d
@@ -660,7 +663,7 @@ class s():
         return accr
 
 
-# In[19]:
+# In[28]:
 
 
 if __name__ == "__main__":
@@ -683,10 +686,10 @@ if __name__ == "__main__":
     m.create_tuple()
 
 
-# In[ ]:
+# In[29]:
 
 
-
+m.load_data()
 
 
 # In[ ]:

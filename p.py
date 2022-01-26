@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import numpy as np
@@ -56,7 +56,7 @@ from sklearn.utils.estimator_checks import check_estimator
 from typing import Union
 
 
-# In[ ]:
+# In[18]:
 
 
 class s():
@@ -133,7 +133,6 @@ class s():
 
         
         
-        
         self._estimator = estimator
         self._gamma = self.d_(gamma)
         self.random_number = random_number if random_number is not None else np.random.randint(0,100,size=None)
@@ -204,7 +203,6 @@ class s():
         :rtype:
         """
         
-        
         if l is None:
             try:
                 k = getattr(s,a)
@@ -218,15 +216,6 @@ class s():
         
         return float(k)
         
-    
-    
-    def instance_attributes(self):
-        """
-        :return: Returns a list of instance attributes
-        :rtype: list
-        """
-        return self.__dict__.keys()
-        
         
     
     
@@ -238,10 +227,11 @@ class s():
         return f"init params:{self.estimator},{self.k}, {self.C}, {self.gamma}, {self.random_number}"
     
     
+    
     def create_tuple(self):
         """Creates a tuple
         :return:
-        :rtype:
+        :rtype: tuple
         """
         self.tuple = ()
         
@@ -280,26 +270,26 @@ class s():
         path = "C:/Users/mpalovic/Desktop"
         ticker = "gspc"
         file_name = "ta.{}".format(str(ticker)) + ".csv"
-        data = pd.read_csv(filepath_or_buffer = "{}/{}".format(path, file_name), 
+        d_ = pd.read_csv(filepath_or_buffer = "{}/{}".format(path, file_name), 
                            parse_dates=["Date"], 
                            sep = ",")
         
         
         
-        df = pd.DataFrame(data)
+        d = pd.DataFrame(d_)
         
-        df.sample(n=5)
+        d.sample(n=5)
         
         
         #choose dtypes
-        df.astype(
+        d.astype(
                 {"Volume":float,"On Balance Volume":float}
             ).dtypes
 
-        df.select_dtypes(np.number)
+        d.select_dtypes(np.number)
         
         
-        return df
+        return d
     
     
     
@@ -350,16 +340,16 @@ class s():
     
     def x_y_(self):
         
-        df = self.mis_vals()
+        d = self.mis_vals()
         
-        pred = (df.shift(-7)["Close"] >= df["Close"]) #bool, if price in 14 days bigger, returns 1
-        df.drop("Close", 1, inplace=True)
+        pred = (d.shift(-7)["Close"] >= d["Close"]) #bool, if price in 14 days bigger, returns 1
+        d.drop("Close", 1, inplace=True)
         pred = pred.iloc[:-7]
-        df["Pred"] = pred.astype(int)
+        d["Pred"] = pred.astype(int)
     
-        df = df.dropna()
-        x = pd.DataFrame(df.loc[:,df.columns != "Pred"])
-        y = df.iloc[:,-1]
+        d = d.dropna()
+        x = pd.DataFrame(d.loc[:,d.columns != "Pred"])
+        y = d.iloc[:,-1]
     
         return x,y
     
@@ -374,7 +364,6 @@ class s():
         
         if isinstance(y,np.ndarray):
             y = LabelEncoder().fit_transform(y)
-        
         
         return y
     
@@ -421,30 +410,23 @@ class s():
             #actual variance of cols
             x.var()
 
-            #columns with variance higher than threshold will remain in dataframe
-            #i want to remove low variance columns
-            #TRUE low variance, FALSE high variance
             selector = VarianceThreshold(num)
             selector.fit_transform(x)
             selector.get_support()
             high_var_cols = [int(i) for i,e in enumerate(selector.get_support(indices = False))]
-            high_var_cols
-            #returns cols with above threshold variance, that is what I want
 
 
             x = pd.DataFrame(x)
             if isinstance(x, pd.DataFrame):
                 c = [x for z,x in enumerate(x.columns) if z not in high_var_cols]
 
-            x = np.array(
-                x[x.columns[~x.columns.isin(c)]])
+            x = np.array(x[x.columns[~x.columns.isin(c)]])
         
         
         
         else:
             pass
         
-        #if num call this func, else call self.scale()
         return x if num else self.scale()
         
     
@@ -461,7 +443,7 @@ class s():
         
             n = int(n)
     
-            #created func above that creates an empty list
+            
             high_score_features = self.create_arr()
             
             
@@ -471,7 +453,7 @@ class s():
             
             
             
-            #must be because of x train columns
+            
             x = pd.DataFrame(x)
             
             if feature_scores.any():
@@ -491,7 +473,7 @@ class s():
     
     
     
-    #takes no arguments and returns a dict of the __init__ parameters of the estimator, together with their values
+    
     def get_params(self, deep = True):
         
         par = {
@@ -676,35 +658,14 @@ class s():
         
         
         return accr
-    
-    
-    
-        
-        
-        
-    
-    def initialise_params(self):
-        """
-        :param arg1: description
-        :type arg1: int
-        :return: initialise params
-        :rtype: int
-        """
-        
-        
-        _, n_features = x.shape
-        w = np.zeros(n_features)
-        b = 0
-        return w, b
 
 
-# In[ ]:
+# In[19]:
 
 
 if __name__ == "__main__":
     m = s(estimator="SVC", k = "linear", C = 1000, gamma = 1, random_number=None)
     m.__str__()
-    m.instance_attributes()
     m.create_arr()
     m.load_data()
     m.datetime_index()
@@ -725,31 +686,37 @@ if __name__ == "__main__":
 # In[ ]:
 
 
-print(m)
 
-
-# In[ ]:
-
-
-m.create_arr()
 
 
 # In[ ]:
 
 
-m.estimator
 
-
-# In[ ]:
-
-
-m.instance_attributes()
 
 
 # In[ ]:
 
 
-m.cA("N_ITERS")
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 import numpy as np
@@ -38,9 +38,7 @@ from sklearn.feature_selection import (VarianceThreshold,
 
 from sklearn.svm import SVC
 
-from sklearn.ensemble import (AdaBoostClassifier, 
-                              BaggingClassifier, 
-                              StackingClassifier)
+
 
 from sklearn.metrics import (confusion_matrix,
                              classification_report,
@@ -55,79 +53,45 @@ from sklearn.model_selection import (train_test_split,
 
 from sklearn.utils.estimator_checks import check_estimator
 
-from sklearn.utils.validation import (check_array, 
-                                      check_is_fitted, 
-                                      check_X_y,
-                                      _check_sample_weight)
-
-from sklearn.base import (BaseEstimator, ClassifierMixin)
-
 from typing import Union
 
 
-# In[2]:
-
-
-#low (inclusive) to high (exclusive)
-np.random.randint(1,2)
-
-
-# In[3]:
+# In[ ]:
 
 
 class s():
     
-    TEST_SIZE = 0.8
+    TEST_SIZE = 0.3
     N_ITERS = 1e3
     TRAILS = 50
     
     
-    """
-    :param c: controls the trade-off between 
-        classifying all the points correctly and having a straight line, 
-        small c cost of misclassif low, soft margin, 
-        large c high cost of misclassif, hard margin 
-    :type c: float
-    
-    :kernel: non-linearly separable data into higher dimension of spaces (linearly separable)
-    :type kernel: str
-    
-    :degree: only relevant for poly kernel, ignored by all other kernels
-    :type degree: int, optional
-    
-    :param gamma: how far the influence of of a training set goes, 
-        high gamma = only points near the decision line are considered to determine the direction of the line, 
-        close points to the line have high weight, 
-        low gamma = points far away from the line are also considered
-    :type gamma: float
-    
-    """
-    
-    
-    def param_check(m):
-        """Checks the type of init params (float, int, str). Custom decorator.
+    def p_c(m):
+        """Checks the type of init params (float, int, str).
         :param m: init method
-        :type m: 
-        
-        :return: init method after params are checked 
-        :rtype: 
+        :return: init method after params are checked
         """
-        #ref refers to self
+        
+        #ref refers to self, arbitrary
         def f(ref, estimator, k, C, gamma, random_number):
-            for p in [C, gamma]:
-                if not isinstance(p,(int,float)):
-                    raise TypeError("c and gamma must be floats")
-                
-                else:
-                    pass
-                
-                
-            for v in [estimator, k]:
-                if not isinstance(v,str):
-                    raise TypeError("estim and k must be strings")
-                else:
-                    pass
             
+            n = 0
+            n = int(n)
+            for p in [C, gamma]:
+                try:
+                    p + n
+                except TypeError as e:
+                    print(e)
+                    
+            
+            j = "v"
+            j = str(j)
+            for v in [estimator, k]:
+                try:
+                    v + j
+                except TypeError as e:
+                    print(e)
+                
             
             return m(ref, estimator, k, C, gamma, random_number)
         
@@ -135,62 +99,65 @@ class s():
     
     
     
-    @param_check
-    def __init__(self, estimator:str = "SVC", k:str = "linear", C:int = 1000, gamma = 1, random_number:int = None):
-        """init method is used to initialise instance attributes.
-        __estimator is a private attribute.
-        :return self.__estimator is used to get values of private attr (indirectly)
-        :estimator.setter is used to set value of a private attr
-        :return: 
-        :rtype: 
-        """
+    @p_c
+    def __init__(self, 
+                 estimator:str = "SVC", 
+                 k:str = "linear", 
+                 C:int = 1000, 
+                 gamma = 1, 
+                 random_number:int = None):
         
-        #kernel dict, self.kernels[self.k], self.k must exactly match the key in dict
+        
+        
+        #init param restriction on the dict
         self.kernels = {
             "linear": self.kernel_linear,
             "rbf": self.kernel_rbf,
             "poly": self.kernel_poly
         }
         
-        
-        #best to leave alone, does not impose restrictions on accessing variable
-        self.__estimator = estimator
-        self.__gamma = self.d_check(gamma)
-        
-        self.random_number = random_number if random_number is not None else np.random.randint(0,100,size=None)
-        
-        
-        
-        
-        #restrictions on the init params
         if k not in self.kernels.keys():
-            raise AttributeError(f"kernel {k} required to be in {self.kernels.keys()}")
+            try:
+                s = self.kernels[k]
+            except KeyError as o:
+                print(f"The kernel {k} is not in {self.kernels.keys()}")
         else:
             self.k = k
             
         
-        
-        if 0.1 <= C <= 1000:
+        #init param restriction on the size
+        if 0.1 <= C <= 10000:
             self.C = C
         else:
-            raise AttributeError(f"Param C:{C} not within required range")
+            self.C = None
+
+        
+        
+        
+        self._estimator = estimator
+        self._gamma = self.d_(gamma)
+        self.random_number = random_number if random_number is not None else np.random.randint(0,100,size=None)
+        
             
             
-            
-            
+    
+    
+    
+    
     @property
     def estimator(self):
-        """Property decorator read only attribute. Instance attr cannot be changed.
+        """Property decorator read only attribute. Instance attr cannot be changed. Getter method.
         :return: 
-        :rtype: 
+        :rtype: str
         """
-        return self.__estimator
-    
+        return self._estimator
     
     @estimator.setter
     def estimator(self,v):
-        self.__estimator = v
+        self._estimator = v
         
+    
+    
     
     @property
     def gamma(self):
@@ -198,21 +165,21 @@ class s():
         :return: without this method private attr cannot be accessed (encapsulation)
         :rtype: 
         """
-        return self.__gamma
+        return self._gamma
     
     @gamma.setter
     def gamma(self, h):
         if 0 <= h <= 1000:
-            self.__gamma = h
+            self._gamma = h
         else:
-            self.__gamma = None
+            self._gamma = None
         
 
             
              
             
     @staticmethod        
-    def d_check(val):
+    def d_(val):
         """Check init param type before it is set in the init method. Only int type.
         :param val: val in the init method
         :type val: 
@@ -223,7 +190,9 @@ class s():
     
     
     
-    def cls_attr(self, a = "N_ITERS", l = None):
+    
+    
+    def cA(self, a:str = None, l = None):
         """Check class attribute, not init (instance) attr. Other methods: getattr, setattr, hasattr.
         Init params are instance attributes, class attributes are defined outside constructor.
         :param u: defaults to None
@@ -236,12 +205,12 @@ class s():
         """
         
         
-        if(l is None):
-            
+        if l is None:
             try:
                 k = getattr(s,a)
             
             except AttributeError as e:
+                
                 print(e)
         
         else:
@@ -268,8 +237,6 @@ class s():
         """
         return f"init params:{self.estimator},{self.k}, {self.C}, {self.gamma}, {self.random_number}"
     
-        
-    
     
     def create_tuple(self):
         """Creates a tuple
@@ -285,7 +252,7 @@ class s():
     def create_arr(self, *args):
         """Creates a list
         :return:
-        :rtype:
+        :rtype: list
         """
         
         self.arr = [*args]
@@ -306,12 +273,18 @@ class s():
     
     
     def load_data(self):
+        """Creates data.
+        :return: data
+        :rtype: dataframe
+        """
         path = "C:/Users/mpalovic/Desktop"
         ticker = "gspc"
         file_name = "ta.{}".format(str(ticker)) + ".csv"
         data = pd.read_csv(filepath_or_buffer = "{}/{}".format(path, file_name), 
                            parse_dates=["Date"], 
                            sep = ",")
+        
+        
         
         df = pd.DataFrame(data)
         
@@ -330,12 +303,12 @@ class s():
     
     
     
+    
     def datetime_index(self):
         """Transforms dates into cos,sin
         :return: dataframe with dates adjusted
         :rtype: dataframe
         """
-        
         pi = float(math.pi)
         
         d = self.load_data()
@@ -348,7 +321,6 @@ class s():
                 d[v] = np.cos(2 * pi * mo / mo.max())
             elif i == 1:
                 d[v] = np.sin(2 * pi * mo / mo.max())
-        
         
         d.drop(labels="Date", axis = 1, inplace = True)
         
@@ -726,43 +698,49 @@ class s():
         return w, b
 
 
-# In[4]:
+# In[ ]:
 
 
 if __name__ == "__main__":
     m = s(estimator="SVC", k = "linear", C = 1000, gamma = 1, random_number=None)
     m.__str__()
     m.instance_attributes()
-    #m.create_arr()
-    #m.load_data()
-    #m.datetime_index()
-    #m.mis_vals()
-    #m.x_y_()
-    #m.label_encoding()
-    #m.data_split()
-    #m.scale()
-    #m.selectK()
-    #m.get_params()
-    #m.return_params()
-    #m.feature_selection()
-    #m.fit()
-    #m.accuracy_score()
-    #m.create_tuple()
+    m.create_arr()
+    m.load_data()
+    m.datetime_index()
+    m.mis_vals()
+    m.x_y_()
+    m.label_encoding()
+    m.data_split()
+    m.scale()
+    m.selectK()
+    m.get_params()
+    m.return_params()
+    m.feature_selection()
+    m.fit()
+    m.accuracy_score()
+    m.create_tuple()
 
 
-# In[5]:
+# In[ ]:
 
 
 print(m)
 
 
-# In[6]:
+# In[ ]:
 
 
-m.__dict__.keys()
+m.create_arr()
 
 
-# In[7]:
+# In[ ]:
+
+
+m.estimator
+
+
+# In[ ]:
 
 
 m.instance_attributes()
@@ -771,28 +749,7 @@ m.instance_attributes()
 # In[ ]:
 
 
-
-
-
-# In[8]:
-
-
-x = 5
-
-
-# In[9]:
-
-
-x
-
-
-# In[10]:
-
-
-try:
-    x.append(8)
-except AttributeError as e:
-    print(e)
+m.cA("N_ITERS")
 
 
 # In[ ]:

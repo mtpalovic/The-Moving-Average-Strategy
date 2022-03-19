@@ -93,7 +93,7 @@ class lr(object):
     
     def mean_se(self,y_p,y)
         """
-        Fit function
+        Mean squared error.
         :param y_: init method
         :type y_: init method
         

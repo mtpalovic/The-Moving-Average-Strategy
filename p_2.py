@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[3]:
+# In[ ]:
 
 
 import numpy as np
@@ -94,11 +94,14 @@ class lr(object):
     def mean_se(self,y_p,y)
         """
         Mean squared error.
-        :param y_: init method
-        :type y_: init method
+        :param y_p: 
+        :type y_p: 
+        
+        :param y: 
+        :type y: 
         
         :return:
-        :rtype: 
+        :rtype:
         
         """
         er = y - y_p

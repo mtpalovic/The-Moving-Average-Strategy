@@ -92,8 +92,8 @@ class lr(object):
     def f(self):
         """
         Fit function
-        :param y_: init method
-        :type y_: init method
+        :param y_: 
+        :type y_: 
         
         :return:
         :rtype: 
@@ -172,7 +172,7 @@ class lr(object):
     def create_dict(self):
         """Creates a dictionary
         :return:
-        :rtype:
+        :rtype: dict
         """
         self.dict = {}
         
@@ -180,10 +180,12 @@ class lr(object):
     
     
     
-    def results(self):
-        fig=plt.figure(figsize=(14,14))
-        a1=fig.add_subplot(211)
+    def res(self):
+        
+        f=plt.figure(figsize=(10,10))
+        q=f.add_subplot(211)
 
-        plt.title('minimisation of errors across the iterations')
-        a1.plot(self.h)
+        plt.title("error minimisation for a number of iterations")
+        
+        q.plot(self.h)
 

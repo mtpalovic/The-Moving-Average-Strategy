@@ -5,7 +5,7 @@
 
 
 import numpy as np
-from scipy import linspace, polyval, polyfit, sqrt, stats, randn, optimize
+from scipy import linspace
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -15,15 +15,12 @@ import csv
 import scipy
 from sklearn.linear_model import LinearRegression
 
-import matplotlib as plt
-get_ipython().run_line_magic('matplotlib', 'inline')
-
-import sphinx
+import matplotlib.pyplot as plt
 
 import random
 
 
-# In[47]:
+# In[ ]:
 
 
 class lr(object):
@@ -180,62 +177,13 @@ class lr(object):
         self.dict = {}
         
         return self.dict
+    
+    
+    
+    def results(self):
+        fig=plt.figure(figsize=(14,14))
+        a1=fig.add_subplot(211)
 
-
-# In[48]:
-
-
-g = [0.1,0.2,0.4,0.8]
-f = [0.8,0.7,0.8,0.9]
-
-
-# In[49]:
-
-
-m = lr(g,f,0.8)
-
-
-# In[50]:
-
-
-m.c(14)
-
-
-# In[51]:
-
-
-m.f()
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-g = [5,10,15,20,25,30,35,40]
-
-
-# In[ ]:
-
-
-a = {}
-for i,v in enumerate(g,0):
-    #print(g[i])
-    a[i] = v
-
-
-# In[ ]:
-
-
-a
-
-
-# In[ ]:
-
-
-
+        plt.title('minimisation of errors across the iterations')
+        a1.plot(self.h)
 

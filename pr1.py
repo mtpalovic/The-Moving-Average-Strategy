@@ -1,23 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 import numpy as np
-from scipy import linspace
-
-import pandas as pd
-import matplotlib.pyplot as plt
-
-import csv
-
-import scipy
-from sklearn.linear_model import LinearRegression
 
 import matplotlib.pyplot as plt
-
-import random
 
 
 # In[ ]:
@@ -29,14 +18,13 @@ class lr(object):
     """
     N_ITERS = 100
     
-    def __init__(self,x0,y0,l):
+    def __init__(self,x0:list = None,y0:list = None,l:float = 0.7):
         """
         Constructor method.
         """
         
         self.x0 = x0
         assert type(x0)==list
-        
         
         
         self.y0 = y0
@@ -52,8 +40,8 @@ class lr(object):
         self.h = np.zeros(lr.N_ITERS)
         
         #weight,bias, not part of init
-        self.a = 2
-        self.b = 3
+        self.a = None
+        self.b = None
     
     
     
@@ -63,9 +51,6 @@ class lr(object):
         :rtype: str
         """
         return f"init params:{self.x0},{self.y0}, {self.l}"
-    
-    
-    
     
     
     
@@ -113,9 +98,9 @@ class lr(object):
             
                 
                 
-                self.a = self.a - dv_a*self.l
+                self.a -= dv_a*self.l
                 
-                self.b = self.b - dv_b*self.l
+                self.b -= dv_b*self.l
              
                 
                 self.mse = self.mean_se(y_,self.y0)
@@ -145,9 +130,7 @@ class lr(object):
         """
         for i,v in enumerate(y0):
             
-            er = y0[i] - y_p
-            
-            mse = (1/self.n)*np.sum(np.square(er))
+            mse = (1/self.n)*np.sum(np.square(y0[i] - y_p))
         
         return mse
     

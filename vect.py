@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[29]:
+# In[ ]:
 
 
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-# In[30]:
+# In[ ]:
 
 
 class non_vect(object):
@@ -36,6 +36,8 @@ class non_vect(object):
         #initialise theta
         self.th = np.ones(self.n)
         
+        
+
        
     def cost(self):
         """
@@ -46,7 +48,7 @@ class non_vect(object):
         
         """
         
-        cost = 0
+        c = 0
         for i in range(self.m):    
             y_hat = 0
             
@@ -74,34 +76,61 @@ class non_vect(object):
         
         """
         
-        
+        #calc cost for each iteration as gradient descent continues
         cost_l = []
         for _ in range(self.n_iters):
+            
+            #only one derivative for each column/feature
             dev_ = []
             for k in range(self.n):
+                
+                #sum derivatives from all rows in a single col
                 dev_sum = 0
                 for i in range(self.m):
+                    
+                    #estimate
                     y_hat = 0
                     for j in range(self.n):
                         y_hat += self.th[j]*self.x0[i][j]
+                    
+                    #derivative for each row 
                     d_i = (y_hat - y[i])*self.x0[i][k]
-                    d += d_i 
-                dev = (1/self.m)*d 
+                    dev_sum += d_i 
+                
+                #append to list
+                #derivative for each column
+                dev = (1/self.m)*dev_sum 
                 dev_.append(dev)
-    
+            
+            
+            #update params stored as self.th acc to lr rate
             self.th = self.th - self.lr*np.array(dev_)
+            
             cos = self.cost()
-            cos_list.append(cos)
+            
+            cost_l.append(cos)
+        
+        return cost_l
 
 
-# In[28]:
+# In[ ]:
 
 
 from sklearn.datasets import load_diabetes
 x,y = load_diabetes(return_X_y=True)
 
-a = non_vect(x,y,0.005,1000)
-a.th
+def NormalizeData(data):
+    return (data - np.min(data)) / (np.max(data) - np.min(data))
+
+X = NormalizeData(x)
+
+a = non_vect(X,y,0.005,100)
+e = a.derivative()
+
+print(e)
+
+
+plt.plot(np.arange(0, 100),e)
 
 
 # In[ ]:

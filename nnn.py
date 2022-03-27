@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[3]:
 
 
 import numpy as np
@@ -12,7 +12,7 @@ random.seed(43)
 import matplotlib.pyplot as plt
 
 
-# In[ ]:
+# In[4]:
 
 
 np.random.seed(43)
@@ -20,7 +20,7 @@ a = np.random.randn(1000,4)
 a
 
 
-# In[ ]:
+# In[5]:
 
 
 np.random.seed(43)
@@ -28,7 +28,7 @@ b = np.random.randn(1000,4)
 b
 
 
-# In[ ]:
+# In[6]:
 
 
 np.random.seed(43)
@@ -36,7 +36,7 @@ c = np.random.randn(1000,1)
 c
 
 
-# In[ ]:
+# In[31]:
 
 
 class nn(object):
@@ -59,53 +59,57 @@ class nn(object):
         
         self.m, self.n = np.shape(self.x0)[0], np.shape(self.x0)[1]
     
-        self.w = np.random.randn(self.n,1)
-        self.b = 1
+        self.w = None
+        self.b = None
         
         
     
-    def __str__(self):
-        """Init params are instance attributes.
-        :return: init param as string
-        :rtype: str
-        """
-        return f"init params:{self.lr}, {self.n_iters}"  
+        
+    def init_params(self):
+        w = np.random.randn(self.n,1)
+        b = 0
+        
+        return w,b
     
-    
-    
-    def create_array(self):
-        """Creates a list
-        :return:
-        :rtype: list
-        """
-        self.array = []
-        
-        return self.array
-        
-        
-        
-        
     
     
     
     def sigmoid(self,z):
+        """Non-linear activation function.
+        :return: 
+        :rtype: 
+        """
         return 1/(1+np.exp(-z))
     
     
-    def forward_propagate(self,vect:False):
-        if not vect:
-            #shape(1000,1)
-            A = self.sigmoid(np.matmul(self.x0,self.w)+self.b)
+    
+    
+    def forward_propagate(self):
+        
+        self.w,self.b = self.init_params()
+        
+        if np.shape(self.x0)[1] == np.shape(self.w)[0]:
             
+            
+            A = self.sigmoid(np.matmul(self.x0,self.w)+self.b)
+        
             cost = (-1/self.m)*np.sum(self.y0*np.log(A)+(1-self.y0)*(np.log(1-A)))
+            
             
             d_w = (1/self.m)*np.matmul(self.x0.T,(A-self.y0))
             d_b = (1/self.m)*np.sum(A-self.y0)
         
+            
             gradients = {
                 "d_w":d_w,
                 "d_b":d_b
-            }
+                }
+        
+        else:
+            
+            print(f"{np.shape(self.x0)[1]} not equal to {np.shape(self.w)[0]}")
+        
+        
         
         return cost, gradients
     
@@ -162,7 +166,7 @@ class nn(object):
         costs = self.create_array()
         
         for i in range(self.n_iters):
-            c,g = self.forward_propagate(vect=False)
+            c,g = self.forward_propagate()
             
             self.w = self.w - self.lr*g["d_w"]
             self.b = self.b - self.lr*g["d_b"]
@@ -179,32 +183,32 @@ class nn(object):
         return params
 
 
-# In[ ]:
+# In[32]:
 
 
 neural_nets = nn(a,c,0.001,1000)
-neural_nets.__str__()
+neural_nets.forward_propagate()
 
 
-# In[ ]:
+# In[22]:
 
 
 np.shape(neural_nets.x0)[1]
 
 
-# In[ ]:
+# In[24]:
 
 
-neural_nets.forward_propagate(False)
+neural_nets.forward_propagate()
 
 
-# In[ ]:
+# In[25]:
 
 
 neural_nets.fwd_propagate()
 
 
-# In[ ]:
+# In[26]:
 
 
 neural_nets.gradient_descent()

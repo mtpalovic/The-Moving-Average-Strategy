@@ -69,7 +69,7 @@ class nn(object):
             
             cost = (-1/self.m)*np.sum(self.y0*np.log(A)+(1-self.y0)*(np.log(1-A)))
             
-            d_w = np.dot(self.x0.T,(A-self.y0))
+            d_w = (1/self.m)*np.matmul(self.x0.T,(A-self.y0))
             d_b = (1/self.m)*np.sum(A-self.y0)
         
             gradients = {
@@ -77,7 +77,7 @@ class nn(object):
                 "d_b":d_b
             }
         
-        return cost
+        return cost, gradients
     
     
     
@@ -96,14 +96,26 @@ class nn(object):
         for z in range(self.m):
             c_m += (self.y0[z]*np.log(B[z])+(1-self.y0[z])*(np.log(1-B[z])))
         
-        c = (-1/self.m)*c_m
+        cost = (-1/self.m)*c_m
+        cost = float(cost)
         
         
         
         
+        d_w1 = (1/self.m)*np.matmul((self.x0).T,(B-self.y0))
+        
+        d_b1 = 0
+        for e in range(self.m):
+            d_b1 += (1/self.m)*np.sum(B[e]-self.y0[e])
+        
+        gradients = {
+                "d_w1":d_w1,
+                "d_b1":d_b1
+            }
         
         
-        return float(c)
+        
+        return cost, gradients
 
 
 # In[ ]:

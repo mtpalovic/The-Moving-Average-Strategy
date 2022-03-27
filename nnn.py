@@ -49,13 +49,43 @@ class nn(object):
         """
         self.x0 = x0
         self.y0 = y0
+        assert(type(x0)==np.ndarray and type(y0)==np.ndarray)
+        
+        
+        
         self.lr = lr
         self.n_iters = n_iters
+        
+        
         self.m, self.n = np.shape(self.x0)[0], np.shape(self.x0)[1]
     
-        
         self.w = np.random.randn(self.n,1)
         self.b = 1
+        
+        
+    
+    def __str__(self):
+        """Init params are instance attributes.
+        :return: init param as string
+        :rtype: str
+        """
+        return f"init params:{self.lr}, {self.n_iters}"  
+    
+    
+    
+    def create_array(self):
+        """Creates a list
+        :return:
+        :rtype: list
+        """
+        self.array = []
+        
+        return self.array
+        
+        
+        
+        
+    
     
     
     def sigmoid(self,z):
@@ -82,10 +112,15 @@ class nn(object):
     
     
     def fwd_propagate(self):
+        
         h = np.zeros((1000,1))
+        
         for i in range(len(self.x0)):
+        
             for j in range(len(self.w[0])):
+        
                 for k in range(len(self.w)):
+        
                     h[i][j] += self.x0[i][k]*self.w[k][j]
         
         B = self.sigmoid(h + self.b)
@@ -113,15 +148,42 @@ class nn(object):
                 "d_b1":d_b1
             }
         
-        
-        
         return cost, gradients
+    
+    
+    
+    
+    def gradient_descent(self):
+        """The below functions runs gradient descent.
+        :return: Optimal parameters w,b
+        :rtype: np.array
+        """
+        
+        costs = self.create_array()
+        
+        for i in range(self.n_iters):
+            c,g = self.forward_propagate(vect=False)
+            
+            self.w = self.w - self.lr*g["d_w"]
+            self.b = self.b - self.lr*g["d_b"]
+    
+            costs.append(c)
+            if i % 100 ==0:
+                print("Costs after iter %i: %f"%(i,c))
+        
+        params = {
+            "w": self.w,
+            "b": self.b
+            }
+        
+        return params
 
 
 # In[ ]:
 
 
 neural_nets = nn(a,c,0.001,1000)
+neural_nets.__str__()
 
 
 # In[ ]:
@@ -140,6 +202,12 @@ neural_nets.forward_propagate(False)
 
 
 neural_nets.fwd_propagate()
+
+
+# In[ ]:
+
+
+neural_nets.gradient_descent()
 
 
 # In[ ]:

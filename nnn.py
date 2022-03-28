@@ -74,15 +74,6 @@ class nn(object):
         self.array = []
         
         return self.array
-        
-        
-    
-        
-    def init_params(self):
-        w = np.random.randn(self.n,1)
-        b = 0
-        
-        return w,b
     
     
     
@@ -99,7 +90,7 @@ class nn(object):
     
     def forward_propagate_vectorised(self):
         
-        #self.w,self.b = self.init_params()
+        
         
         
         if np.shape(self.x0)[1] == np.shape(self.w)[0]:
@@ -167,7 +158,7 @@ class nn(object):
         
         
         
-        #calculate derivatives using a for loop
+        
         d_w1 = (1/self.m)*np.matmul((self.x0).T,(B-self.y0))
         
         

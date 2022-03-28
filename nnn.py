@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[3]:
+# In[ ]:
 
 
 import numpy as np
@@ -12,7 +12,7 @@ random.seed(43)
 import matplotlib.pyplot as plt
 
 
-# In[4]:
+# In[ ]:
 
 
 np.random.seed(43)
@@ -20,7 +20,7 @@ a = np.random.randn(1000,4)
 a
 
 
-# In[5]:
+# In[ ]:
 
 
 np.random.seed(43)
@@ -28,7 +28,7 @@ b = np.random.randn(1000,4)
 b
 
 
-# In[6]:
+# In[ ]:
 
 
 np.random.seed(43)
@@ -36,7 +36,7 @@ c = np.random.randn(1000,1)
 c
 
 
-# In[31]:
+# In[ ]:
 
 
 class nn(object):
@@ -64,6 +64,19 @@ class nn(object):
         
         
     
+    
+    def create_array(self):
+        """Creates a list
+        :return:
+        :rtype: list
+        """
+        
+        self.array = []
+        
+        return self.array
+        
+        
+    
         
     def init_params(self):
         w = np.random.randn(self.n,1)
@@ -84,14 +97,15 @@ class nn(object):
     
     
     
-    def forward_propagate(self):
+    def forward_propagate_vectorised(self):
         
         self.w,self.b = self.init_params()
         
+        
         if np.shape(self.x0)[1] == np.shape(self.w)[0]:
             
-            
             A = self.sigmoid(np.matmul(self.x0,self.w)+self.b)
+            
         
             cost = (-1/self.m)*np.sum(self.y0*np.log(A)+(1-self.y0)*(np.log(1-A)))
             
@@ -111,11 +125,11 @@ class nn(object):
         
         
         
-        return cost, gradients
+        return cost,gradients
     
     
     
-    def fwd_propagate(self):
+    def forward_propagate_not_vectorised(self):
         
         h = np.zeros((1000,1))
         
@@ -132,10 +146,13 @@ class nn(object):
         
         
         c_m = 0
+        
         for z in range(self.m):
+            
             c_m += (self.y0[z]*np.log(B[z])+(1-self.y0[z])*(np.log(1-B[z])))
         
         cost = (-1/self.m)*c_m
+        
         cost = float(cost)
         
         
@@ -144,7 +161,9 @@ class nn(object):
         d_w1 = (1/self.m)*np.matmul((self.x0).T,(B-self.y0))
         
         d_b1 = 0
+        
         for e in range(self.m):
+            
             d_b1 += (1/self.m)*np.sum(B[e]-self.y0[e])
         
         gradients = {
@@ -166,12 +185,14 @@ class nn(object):
         costs = self.create_array()
         
         for i in range(self.n_iters):
-            c,g = self.forward_propagate()
+            
+            c,g = self.forward_propagate_vectorised()
             
             self.w = self.w - self.lr*g["d_w"]
             self.b = self.b - self.lr*g["d_b"]
     
             costs.append(c)
+            
             if i % 100 ==0:
                 print("Costs after iter %i: %f"%(i,c))
         
@@ -183,35 +204,34 @@ class nn(object):
         return params
 
 
-# In[32]:
+# In[ ]:
 
 
 neural_nets = nn(a,c,0.001,1000)
-neural_nets.forward_propagate()
 
 
-# In[22]:
+# In[ ]:
 
 
-np.shape(neural_nets.x0)[1]
+neural_nets.forward_propagate_vectorised()
 
 
-# In[24]:
+# In[ ]:
 
 
-neural_nets.forward_propagate()
+neural_nets.forward_propagate_not_vectorised()
 
 
-# In[25]:
+# In[ ]:
 
 
-neural_nets.fwd_propagate()
 
 
-# In[26]:
+
+# In[ ]:
 
 
-neural_nets.gradient_descent()
+
 
 
 # In[ ]:

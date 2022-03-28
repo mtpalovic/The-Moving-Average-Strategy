@@ -59,8 +59,8 @@ class nn(object):
         
         self.m, self.n = np.shape(self.x0)[0], np.shape(self.x0)[1]
     
-        self.w = None
-        self.b = None
+        self.w = np.random.randn(self.n,1)
+        self.b = 0
         
         
     
@@ -99,7 +99,7 @@ class nn(object):
     
     def forward_propagate_vectorised(self):
         
-        self.w,self.b = self.init_params()
+        #self.w,self.b = self.init_params()
         
         
         if np.shape(self.x0)[1] == np.shape(self.w)[0]:
@@ -206,10 +206,10 @@ class nn(object):
             
         for i in range(self.n_iters):
             
-            c,g = self.forward_propagate_vectorised()
+            c,g = self.forward_propagate_not_vectorised()
             
-            self.w = self.w - self.lr*g["d_w"]
-            self.b = self.b - self.lr*g["d_b"]
+            self.w = self.w - self.lr*g["d_w1"]
+            self.b = self.b - self.lr*g["d_b1"]
     
             costs.append(c)
             
@@ -221,13 +221,15 @@ class nn(object):
             "b": self.b
             }
         
+        plt.plot(costs)
+        
         return params
 
 
 # In[ ]:
 
 
-neural_nets = nn(a,c,0.001,1000)
+neural_nets = nn(a,c,0.005,2500)
 
 
 # In[ ]:

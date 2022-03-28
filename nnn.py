@@ -106,26 +106,30 @@ class nn(object):
             
             A = self.sigmoid(np.matmul(self.x0,self.w)+self.b)
             
-        
-            cost = (-1/self.m)*np.sum(self.y0*np.log(A)+(1-self.y0)*(np.log(1-A)))
+            if np.shape(A) == (np.size(A,0),np.size(self.w,1)):
             
             
-            d_w = (1/self.m)*np.matmul(self.x0.T,(A-self.y0))
-            d_b = (1/self.m)*np.sum(A-self.y0)
+                cost = (-1/self.m)*np.sum(self.y0*np.log(A)+(1-self.y0)*(np.log(1-A)))
+            
+            
+                d_w = (1/self.m)*np.matmul(self.x0.T,(A-self.y0))
+                d_b = (1/self.m)*np.sum(A-self.y0)
         
             
-            gradients = {
-                "d_w":d_w,
-                "d_b":d_b
-                }
+                gradients = {
+                        "d_w":d_w,
+                        "d_b":d_b
+                    }
         
-        else:
+            else:
             
-            print(f"{np.shape(self.x0)[1]} not equal to {np.shape(self.w)[0]}")
+                print(f"{np.shape(self.x0)[1]} not equal to {np.shape(self.w)[0]}")
         
         
         
-        return cost,gradients
+        return cost, gradients
+    
+    
     
     
     
@@ -144,6 +148,7 @@ class nn(object):
         B = self.sigmoid(h + self.b)
         
         
+        #calculate cost using a for loop
         
         c_m = 0
         
@@ -158,13 +163,21 @@ class nn(object):
         
         
         
+        #calculate derivatives using a for loop
         d_w1 = (1/self.m)*np.matmul((self.x0).T,(B-self.y0))
+        
+        
+        
         
         d_b1 = 0
         
         for e in range(self.m):
             
-            d_b1 += (1/self.m)*np.sum(B[e]-self.y0[e])
+            d_b1 += B[e]-self.y0[e]
+        
+        d_b1 = (1/self.m)*d_b1
+        
+        
         
         gradients = {
                 "d_w1":d_w1,
@@ -220,18 +233,6 @@ neural_nets.forward_propagate_vectorised()
 
 
 neural_nets.forward_propagate_not_vectorised()
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
 
 # In[ ]:

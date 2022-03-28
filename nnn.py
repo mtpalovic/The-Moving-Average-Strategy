@@ -181,6 +181,8 @@ class nn(object):
         
         d_b1 = (1/self.m)*d_b1
         
+        d_b1 = float(d_b1)
+        
         
         
         gradients = {
@@ -201,6 +203,7 @@ class nn(object):
         
         costs = self.create_array()
         
+            
         for i in range(self.n_iters):
             
             c,g = self.forward_propagate_vectorised()
@@ -211,7 +214,7 @@ class nn(object):
             costs.append(c)
             
             if i % 100 ==0:
-                print("Costs after iter %i: %f"%(i,c))
+                print(f"Costs after iter {i}:{c}")
         
         params = {
             "w": self.w,
@@ -237,6 +240,24 @@ neural_nets.forward_propagate_vectorised()
 
 
 neural_nets.forward_propagate_not_vectorised()
+
+
+# In[ ]:
+
+
+neural_nets.gradient_descent()
+
+
+# In[ ]:
+
+
+neural_nets.init_params()
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:

@@ -120,10 +120,14 @@ class nn(object):
                         "d_w":d_w,
                         "d_b":d_b
                     }
-        
-            else:
+                
             
-                print(f"{np.shape(self.x0)[1]} not equal to {np.shape(self.w)[0]}")
+            else:
+                print(f"must be of shape ({np.size(A,0)},{np.size(self.w,1)})")
+                
+        else:
+            
+            print(f"{np.shape(self.x0)[1]} not equal to {np.shape(self.w)[0]}")
         
         
         
@@ -233,12 +237,6 @@ neural_nets.forward_propagate_vectorised()
 
 
 neural_nets.forward_propagate_not_vectorised()
-
-
-# In[ ]:
-
-
-
 
 
 # In[ ]:

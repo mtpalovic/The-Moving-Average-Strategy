@@ -19,7 +19,7 @@ class lr(object):
     Class constructor.
     """
     
-    def __init__(self,x0:np.ndarray, y0:np.ndarray,lr:float=0.001,n_iters:int=1000):
+    def __init__(self,x0:np.ndarray, y0:np.ndarray,lr:float=0.001,n_iters:int=10000):
         """
         Constructor method.
         """
@@ -225,7 +225,7 @@ class lr(object):
     
         plt.plot(c_k)
     
-        return len(c_k)
+        return c_k[-1]
 
 
 # In[ ]:
@@ -233,7 +233,7 @@ class lr(object):
 
 #generate random data with seed for reproducibility
 np.random.seed(43)
-a = np.random.randn(1000,10)
+a = np.random.randn(10000,10)
 a
 
 
@@ -241,14 +241,14 @@ a
 
 
 np.random.seed(43)
-b = np.random.randn(1000,1)
+b = np.random.randn(10000,1)
 b
 
 
 # In[ ]:
 
 
-a = lr(a,b,0.001,1000)
+a = lr(a,b,0.00001,100000)
 
 
 # In[ ]:

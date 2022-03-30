@@ -89,9 +89,10 @@ class nn(object):
     
     
     def forward_propagate_vectorised(self):
-        
-        
-        
+        """Forward propagation. Vectorised Implementation.
+        :return: 
+        :rtype: 
+        """
         
         if np.shape(self.x0)[1] == np.shape(self.w)[0]:
             
@@ -129,7 +130,11 @@ class nn(object):
     
     
     def forward_propagate_not_vectorised(self):
-        
+         """Forward propagation. Non-Vectorised Implementation.
+        :return: 
+        :rtype: 
+        """
+            
         h = np.zeros((1000,1))
         
         for i in range(len(self.x0)):
@@ -197,10 +202,10 @@ class nn(object):
             
         for i in range(self.n_iters):
             
-            c,g = self.forward_propagate_not_vectorised()
+            c,g = self.forward_propagate_vectorised()
             
-            self.w = self.w - self.lr*g["d_w1"]
-            self.b = self.b - self.lr*g["d_b1"]
+            self.w = self.w - self.lr*g["d_w"]
+            self.b = self.b - self.lr*g["d_b"]
     
             costs.append(c)
             
@@ -239,12 +244,6 @@ neural_nets.forward_propagate_not_vectorised()
 
 
 neural_nets.gradient_descent()
-
-
-# In[ ]:
-
-
-neural_nets.init_params()
 
 
 # In[ ]:

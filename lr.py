@@ -25,7 +25,7 @@ class lr(object):
         """
         self.x0 = x0
         self.y0 = y0
-        #assert(type(x0)==np.ndarray and type(y0)==np.ndarray) 
+        assert(type(x0)==np.ndarray and type(y0)==np.ndarray) 
         
         
         self.lr = lr
@@ -254,13 +254,13 @@ a = lr(a,b,0.00001,100000)
 # In[ ]:
 
 
-a.cost_not_vectorised()
+#a.cost_not_vectorised()
 
 
 # In[ ]:
 
 
-a.gradient_descent_not_vectorised()
+#a.gradient_descent_not_vectorised()
 
 
 # In[ ]:

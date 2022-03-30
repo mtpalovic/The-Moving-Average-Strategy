@@ -142,7 +142,7 @@ class lr(object):
             
             cos = self.cost_not_vectorised()
             
-            cost_l.append(float(cos))
+            cost_l.append(cos)
             
             plt.plot(cost_l)
         
@@ -175,7 +175,7 @@ class lr(object):
                 if np.shape(b.T)[1] == np.shape(b)[0]:
                 
                     c = b.T@b
-                    c = (1/(2*self.m))*c
+                    cost = (1/(2*self.m))*c
                 
                 else:
                     print(f"{np.shape(b.T)[1]} must be equal to {np.shape(b)[0]}")
@@ -190,7 +190,7 @@ class lr(object):
             print(f"{np.shape(self.x0)[1]} not equal to {np.shape(self.th)[0]}")
         
         
-        return c
+        return cost
     
     
     
@@ -202,19 +202,28 @@ class lr(object):
         
         
         e = np.reshape(self.x0@self.th,(-1,1)) - self.y0 
+        
+        #reshape into column vector
         self.th = np.reshape(self.th,(-1,1))
         
         
         c_k = []
+        
         for i in range(self.n_iters):
-            self.th = self.th - self.lr*(1/self.m)*(self.x0.T@e)
+            
+            if np.shape(self.x0.T)[1] == np.shape(e)[0]:
+                
+                self.th = self.th - self.lr*(1/self.m)*(self.x0.T@e)
+                
         
-        
-            cost_i = self.cost_vectorised()
-            c_k.append(float(cost_i))
+                cost_i = self.cost_vectorised()
+                c_k.append(float(cost_i))
+            
+            
+            else:
+                print(f"num of cols {np.shape(self.x0.T)[1]} not equal to num of rows {np.shape(e)[0]}")
     
-            plt.plot(c_k)
-    
+        plt.plot(c_k)
     
         return len(c_k)
 
@@ -222,6 +231,7 @@ class lr(object):
 # In[ ]:
 
 
+#generate random data with seed for reproducibility
 np.random.seed(43)
 a = np.random.randn(1000,10)
 a
@@ -263,12 +273,6 @@ a.cost_vectorised()
 
 
 a.gradient_descent_vectorised()
-
-
-# In[ ]:
-
-
-
 
 
 # In[ ]:

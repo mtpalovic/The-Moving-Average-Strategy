@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 import numpy as np
@@ -12,7 +12,7 @@ random.seed(43)
 import matplotlib.pyplot as plt
 
 
-# In[2]:
+# In[ ]:
 
 
 #generate random data with seed for reproducibility
@@ -21,7 +21,7 @@ np.random.seed(43)
 a = np.random.randn(1000,4)
 
 
-# In[3]:
+# In[ ]:
 
 
 #generate random data with seed for reproducibility
@@ -38,7 +38,7 @@ b = np.random.randn(1000,1)
 
 # $$\frac{\partial J}{\partial b} = \frac{1}{m}\sum\limits_{i=1}^{m}(a_i - y_i)$$
 
-# In[4]:
+# In[ ]:
 
 
 class nn(object):
@@ -302,31 +302,31 @@ class nn(object):
         return optim_params
 
 
-# In[5]:
+# In[ ]:
 
 
 neural_nets = nn(a,b,0.005,2500)
 
 
-# In[6]:
+# In[ ]:
 
 
 neural_nets.w
 
 
-# In[7]:
+# In[ ]:
 
 
 neural_nets.forward_propagate_vectorised()
 
 
-# In[8]:
+# In[ ]:
 
 
 neural_nets.forward_propagate_not_vectorised()
 
 
-# In[9]:
+# In[ ]:
 
 
 neural_nets.gradient_descent()

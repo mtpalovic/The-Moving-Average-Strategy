@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import numpy as np
@@ -12,7 +12,7 @@ random.seed(43)
 import matplotlib.pyplot as plt
 
 
-# In[ ]:
+# In[2]:
 
 
 #generate random data with seed for reproducibility
@@ -21,7 +21,7 @@ np.random.seed(43)
 a = np.random.randn(1000,4)
 
 
-# In[ ]:
+# In[3]:
 
 
 #generate random data with seed for reproducibility
@@ -38,7 +38,7 @@ b = np.random.randn(1000,1)
 
 # $$\frac{\partial J}{\partial b} = \frac{1}{m}\sum\limits_{i=1}^{m}(a_i - y_i)$$
 
-# In[ ]:
+# In[4]:
 
 
 class nn(object):
@@ -207,7 +207,7 @@ class nn(object):
         cost = float(cost)
         
         
-        #d_w1 = (1/self.m)*np.matmul((self.x0).T,(B-self.y0))
+        
         
         #derivative of the cost function w.r.t. w in non-vectorised form
         #first matrix substraction B - self.y0, both shape (1000,1)
@@ -302,31 +302,31 @@ class nn(object):
         return optim_params
 
 
-# In[ ]:
+# In[5]:
 
 
 neural_nets = nn(a,b,0.005,2500)
 
 
-# In[ ]:
+# In[6]:
 
 
 neural_nets.w
 
 
-# In[ ]:
+# In[7]:
 
 
 neural_nets.forward_propagate_vectorised()
 
 
-# In[ ]:
+# In[8]:
 
 
 neural_nets.forward_propagate_not_vectorised()
 
 
-# In[ ]:
+# In[9]:
 
 
 neural_nets.gradient_descent()

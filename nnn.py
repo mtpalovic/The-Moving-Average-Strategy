@@ -231,11 +231,11 @@ class nn(object):
         
         for m in range(len(self.x0.T)):
         
-                for n in range(len(K[0])):
+            for n in range(len(K[0])):
         
-                    for k in range(len(K)):
+                for k in range(len(K)):
         
-                        L[m][n] += self.x0.T[m][k]*K[k][n]
+                    L[m][n] += self.x0.T[m][k]*K[k][n]
         
         
         d_w1 = (1/self.m)*L
@@ -330,4 +330,10 @@ neural_nets.forward_propagate_not_vectorised()
 
 
 neural_nets.gradient_descent()
+
+
+# In[ ]:
+
+
+
 

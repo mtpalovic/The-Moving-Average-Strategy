@@ -50,7 +50,7 @@ class lr(object):
     Class constructor.
     """
     
-    def __init__(self,x0:np.ndarray, y0:np.ndarray,lr:float=0.001,n_iters:int=1000):
+    def __init__(self,x0:np.ndarray, y0:np.ndarray,lr:float=0.1,n_iters:int=100):
         """
         Constructor method.
         """
@@ -69,13 +69,15 @@ class lr(object):
         # 1D array of size n_features
         #initialise theta
         #column vector of of shape(10,1)
-        self.th = np.random.randn(self.n,1)
+        self.th = np.ones(self.n).reshape(-1,1)
         
-    
         
     
     
     def cost_not_vectorised(self, theta):
+        
+        
+        
         
         #this indicates that cost will be a float
         #calculate cost at each row or sample and then sum
@@ -86,17 +88,21 @@ class lr(object):
             #at each row, iterate over all columns/parameters stored in theta
             y_hat = 0
             for j in range(self.n):
+                #element-wise multiplication
+                #not matrix multiplication
+                
+                
+                #theta of shape (10,1) and self.x0 of shape(1000,10)
                 y_hat += theta[j]*self.x0[i][j]
             
             #np.power because of neg distance and punishing large outliers
             #cost for row i, substract actual from prediction
             c_i = (y_hat - self.y0[i])**2
             c += c_i
-            c = float(c)
-        
+            c = float(c[0])
         
         #out of for loop
-        cost = (1/(2*self.m))*c
+        cost = (1/(2*self.m))*float(c)
         
         return cost
     
@@ -105,12 +111,7 @@ class lr(object):
     
     def gradient_descent_not_vectorised(self):
         
-        np.random.seed(63)
-        self.th = np.random.randn(self.n,1)
-        
         cost_list = []
-        
-        
         for _ in range(self.n_iters):
             
             
@@ -151,14 +152,18 @@ class lr(object):
             #both self.th and np.array(derivatives_list) are column vectors of shape (10,1)
             #indexed by z, hence result is a column vector of original shape
             
-            derivatives_list = np.array(derivatives_list).reshape(-1,1)
-            for z in range(len(self.th)):
-                self.th[z] = self.th[z] - self.lr*derivatives_list[z]
+            #derivatives_list = np.array(derivatives_list).reshape(-1,1)
+            #for z in range(len(self.th)):
+                #self.th[z] = self.th[z] - self.lr*derivatives_list[z]
             
             
+            
+            
+            self.th = self.th - self.lr*np.array(derivatives_list)
             cost = self.cost_not_vectorised(self.th)
-            cost_list.append(cost)
             
+            
+            cost_list.append(cost)
             plt.plot(cost_list)
         
         return cost_list
@@ -173,14 +178,14 @@ class lr(object):
         
         
         
+        
+        
         #self.x0 of shape (1000,10) and self.th of shape (10,1)
         #the matrix multiplication result of shape (1000,1)
         if np.shape(self.x0)[1] == np.shape(theta)[0]:
         
             a = self.x0@theta
             a = a.reshape(-1,1) #shape (1000,1)
-            
-            theta = np.reshape(theta,(-1,1)) #to be sure that shape (10,1)
             
             
             #vector shape (1000,1) necessary for column vector substraction in vectorised form
@@ -194,7 +199,9 @@ class lr(object):
                     #b.T of shape (1,1000) and b of shape (1000,1)
                     #matrix multiplication result of shape (1,1), which is a scalar
                     #equation 7
-                    c = float(b.T@b)
+                    c = b.T@b
+                    cost = (1/(2*self.m))*float(c)
+                
                 
                 else:
                     #if this not true, matrix multiplication cannot be calculated
@@ -212,7 +219,7 @@ class lr(object):
             print(f"{np.shape(self.x0)[1]} not equal to {np.shape(theta)[0]}")
         
         
-        cost = (1/(2*self.m))*c
+        
         
         
         return cost
@@ -226,40 +233,34 @@ class lr(object):
     def gradient_descent_vectorised(self):
         
         
-        np.random.seed(63)
-        self.th = np.random.randn(self.n,1)
-        
-        
         #self.x0 shape (1000,10) and self.th (10,1)
         #the product of matrix multiplication is of shape (1000,1)
         #self.y0 shape (1000,1)
         #e hence of shape (1000,1)
-        e = np.reshape(self.x0@self.th,(-1,1)) - self.y0 
         
         
-        #reshape into column vector
-        #to ensure that shape (10,1)
-        self.th = np.reshape(self.th,(-1,1))
+        #e = np.reshape(self.x0@self.th,(-1,1)) - self.y0
         
         
         cost_list1 = []
         
-        for i in range(self.n_iters):
+        for z in range(self.n_iters):
             
-            #if np.shape(self.x0.T)[1] == np.shape(e)[0]:
-            
-                
             #update params acc to learning rate 
             #old param value minus (learning rate x derivative) 
+            
+            e = np.reshape(self.x0@self.th,(-1,1)) - self.y0
             self.th = self.th - self.lr*(1/self.m)*(self.x0.T@e)
             
             
-            #else:
-                #print(f"num of cols {np.shape(self.x0.T)[1]} not equal to num of rows {np.shape(e)[0]}")
-    
-    
-    
-    
+            
+            
+            
+            
+            #self.th = self.th - self.lr*(1/self.m)*np.transpose(self.x0)@(self.x0@self.th-self.y0)
+            
+            
+            
             cost_i = self.cost_vectorised(self.th)
             cost_list1.append(cost_i)
     
@@ -272,13 +273,13 @@ class lr(object):
 # In[ ]:
 
 
-a = lr(a,b,0.001,1000)
+a = lr(a,b,0.1,100)
 
 
 # In[ ]:
 
 
-#a.cost_not_vectorised()
+a.cost_not_vectorised(a.th)
 
 
 # In[ ]:
@@ -290,25 +291,13 @@ a.gradient_descent_not_vectorised()
 # In[ ]:
 
 
-#a.cost_vectorised()
+a.cost_vectorised(a.th)
 
 
 # In[ ]:
 
 
 a.gradient_descent_vectorised()
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
 
 
 # In[ ]:

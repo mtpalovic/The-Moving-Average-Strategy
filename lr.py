@@ -69,14 +69,13 @@ class lr(object):
         # 1D array of size n_features
         #initialise theta
         #column vector of of shape(10,1)
+        #np.ones creates a tuple (10,)
         self.th = np.ones(self.n).reshape(-1,1)
         
         
     
     
     def cost_not_vectorised(self, theta):
-        
-        
         
         
         #this indicates that cost will be a float
@@ -92,16 +91,16 @@ class lr(object):
                 #not matrix multiplication
                 
                 
-                #theta of shape (10,1) and self.x0 of shape(1000,10)
+                #self.x0 of shape(1000,10) and theta of shape (10,1)
+                #equation 1
                 y_hat += theta[j]*self.x0[i][j]
             
             #np.power because of neg distance and punishing large outliers
             #cost for row i, substract actual from prediction
+            #equation 2 (short version) or equation 3 (long version)
             c_i = (y_hat - self.y0[i])**2
             c += c_i
-            c = float(c[0])
-        
-        #out of for loop
+            
         cost = (1/(2*self.m))*float(c)
         
         return cost
@@ -114,6 +113,13 @@ class lr(object):
         cost_list = []
         for _ in range(self.n_iters):
             
+            
+            #here starts equation 4 (short version) or equation 5 (long version)
+            #first iterate over num of features
+            #calc y_hat - iterate over samples and features as in previous step
+            #calculate derivative at that row i (sample i)
+            #sum derivatives from all rows for a single theta j
+            #repeat over all j
             
             derivatives_list = []
             for k in range(self.n):
@@ -135,34 +141,34 @@ class lr(object):
                     #derivative of theta j at row i
                     d_i = (y_hat - self.y0[i])*self.x0[i][k]
                     
-                    #sum all rows and store as d_j, derivative of theta j
+                    #sum all rows and store as d_j, derivative of theta j (sum all rows i)
                     d_j += d_i 
                 
                 
-                #once iterative over all 10 theta parameters
+                
                 #append derivative for each column (of each parameter) to a list
                 derivatives = (1/self.m)*d_j
-                
-                #derivatives = float(derivatives)
                 derivatives_list.append(derivatives)
             
             
             
-            #update params stored as self.th acc to lr rate
-            #both self.th and np.array(derivatives_list) are column vectors of shape (10,1)
+            #update params stored as self.th according to lr rate
+            #both self.th and derivatives_list are column vectors of shape (10,1)
             #indexed by z, hence result is a column vector of original shape
             
-            #derivatives_list = np.array(derivatives_list).reshape(-1,1)
-            #for z in range(len(self.th)):
-                #self.th[z] = self.th[z] - self.lr*derivatives_list[z]
+            derivatives_list = np.array(derivatives_list).reshape(-1,1)
+            for z in range(len(self.th)):
+                
+                #equation 6
+                self.th[z] = self.th[z] - self.lr*derivatives_list[z]
             
             
             
             
-            self.th = self.th - self.lr*np.array(derivatives_list)
+            #pass updated parameters to the cost function
             cost = self.cost_not_vectorised(self.th)
             
-            
+            #append to list and start iterate again
             cost_list.append(cost)
             plt.plot(cost_list)
         
@@ -177,6 +183,7 @@ class lr(object):
     def cost_vectorised(self, theta):
         
         
+        #b refers to x@theta - y in equation 7 for conciseness
         
         
         
@@ -185,7 +192,7 @@ class lr(object):
         if np.shape(self.x0)[1] == np.shape(theta)[0]:
         
             a = self.x0@theta
-            a = a.reshape(-1,1) #shape (1000,1)
+            a = a.reshape(-1,1) #shape (1000,1), not necessary
             
             
             #vector shape (1000,1) necessary for column vector substraction in vectorised form
@@ -198,6 +205,8 @@ class lr(object):
                 
                     #b.T of shape (1,1000) and b of shape (1000,1)
                     #matrix multiplication result of shape (1,1), which is a scalar
+                    
+                    
                     #equation 7
                     c = b.T@b
                     cost = (1/(2*self.m))*float(c)
@@ -232,33 +241,26 @@ class lr(object):
     
     def gradient_descent_vectorised(self):
         
-        
-        #self.x0 shape (1000,10) and self.th (10,1)
-        #the product of matrix multiplication is of shape (1000,1)
-        #self.y0 shape (1000,1)
-        #e hence of shape (1000,1)
-        
-        
-        #e = np.reshape(self.x0@self.th,(-1,1)) - self.y0
-        
-        
         cost_list1 = []
         
         for z in range(self.n_iters):
             
-            #update params acc to learning rate 
-            #old param value minus (learning rate x derivative) 
-            
-            e = np.reshape(self.x0@self.th,(-1,1)) - self.y0
-            self.th = self.th - self.lr*(1/self.m)*(self.x0.T@e)
             
             
+            #shape(1000,1)
+            a = np.reshape(self.x0@self.th - self.y0,(-1,1))
             
+            #shape (10,1000)
+            b = self.x0.T
             
+            #matrix multiplication result of shape (10,1) which is exactly shape of self.th
+            #c is the derivative of the cost function w.r.t. j, equation 8
+            c = b@a
+            c = (1/self.m)*c
             
-            
-            #self.th = self.th - self.lr*(1/self.m)*np.transpose(self.x0)@(self.x0@self.th-self.y0)
-            
+            #old parameter value minus (learning rate x derivative) 
+            #update params according to learning rate and derivative calculated above
+            self.th = self.th - self.lr*c
             
             
             cost_i = self.cost_vectorised(self.th)
@@ -279,13 +281,13 @@ a = lr(a,b,0.1,100)
 # In[ ]:
 
 
-a.cost_not_vectorised(a.th)
+#a.cost_not_vectorised(a.th)
 
 
 # In[ ]:
 
 
-a.gradient_descent_not_vectorised()
+#a.gradient_descent_not_vectorised()
 
 
 # In[ ]:
